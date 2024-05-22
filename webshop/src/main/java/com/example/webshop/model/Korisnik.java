@@ -7,7 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "Korisnik")
@@ -16,7 +19,7 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Korisnik {
+public class Korisnik implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -61,6 +64,21 @@ public class Korisnik {
     @Column
     private Boolean blokiran;
 
+    @OneToMany(mappedBy = "korisnikKojiJeDaoRecenziju", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<Recenzija> recenzije = new HashSet<>();
+
+    @OneToMany(mappedBy = "korisnikKojiJeDobioRecenziju", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<Recenzija> dobijeneRecenzije = new HashSet<>();
+
+    @OneToMany(mappedBy = "podnosiocPrijave", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<PrijavaProfila> prijava = new HashSet<>();
+
+    @OneToMany(mappedBy = "prijavljeniKorisnik", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<PrijavaProfila> prijavljen = new HashSet<>();
 
 
 }
