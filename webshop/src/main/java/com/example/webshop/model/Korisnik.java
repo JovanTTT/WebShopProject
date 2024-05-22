@@ -2,7 +2,9 @@ package com.example.webshop.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
@@ -12,6 +14,8 @@ import java.util.Date;
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Korisnik {
 
     @Id
@@ -57,6 +61,6 @@ public class Korisnik {
     @Column
     private Boolean blokiran;
 
-    
+
 
 }
