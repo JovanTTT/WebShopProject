@@ -1,5 +1,6 @@
 package com.example.webshop.controller;
 
+import com.example.webshop.DTO.PrijavaKorisnikaDTO;
 import com.example.webshop.DTO.RegistracijaKorisnikaDTO;
 import com.example.webshop.error.EmailAlreadyExistsException;
 import com.example.webshop.error.PasswordMismatchException;
@@ -31,6 +32,20 @@ public class KorisnikController {
 
         Korisnik registrovaniKorisnik = korisnikService.registracijaKorisnika(korisnik);
         return new ResponseEntity<>(registrovaniKorisnik, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> prijava(@RequestBody PrijavaKorisnikaDTO prijavaDto, HttpSession session){
+
+        if(prijavaDto.getKorisnickoIme().isEmpty() || prijavaDto.getLozinka().isEmpty())
+            return new ResponseEntity("Neispravni podaci, molim Vas pokušajte ponovo.", HttpStatus.BAD_REQUEST);
+
+        Korisnik loginovaniKorisnik = korisnikService.prijava(prijavaDto.getKorisnickoIme(), prijavaDto.getLozinka());
+        if (loginovaniKorisnik == null)
+            return new ResponseEntity<>("Korisnik ne postoji.", HttpStatus.NOT_FOUND);
+
+        session.setAttribute("korisnik", loginovaniKorisnik);
+        return ResponseEntity.ok("Prijava uspešna.");
     }
 }
 
