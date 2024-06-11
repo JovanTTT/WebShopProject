@@ -67,5 +67,14 @@ public class KorisnikService {
 
         return korisnik;
     }
+
+    public Korisnik prijava(String korisnickoIme, String lozinka) {
+
+        Korisnik korisnik = korisnikRepository.getByKorisnickoIme(korisnickoIme);
+        if(korisnik == null || !korisnik.getLozinka().equals(lozinka))
+            return null;
+        return  korisnik;
+
+    }
 }
 
