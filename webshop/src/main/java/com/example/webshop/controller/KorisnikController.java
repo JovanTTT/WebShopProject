@@ -47,5 +47,17 @@ public class KorisnikController {
         session.setAttribute("korisnik", loginovaniKorisnik);
         return ResponseEntity.ok("Prijava uspešna.");
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity Odjava(HttpSession session){
+
+        Korisnik loggedEmployee = (Korisnik) session.getAttribute("korisnik");
+
+        if (loggedEmployee == null)
+            return new ResponseEntity("Došlo je do greške prilikom odjave.", HttpStatus.FORBIDDEN);
+
+        session.invalidate();
+        return new ResponseEntity("Odjava uspešna.", HttpStatus.OK);
+    }
 }
 
