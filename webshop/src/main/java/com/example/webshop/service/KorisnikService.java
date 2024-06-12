@@ -4,6 +4,7 @@ import com.example.webshop.DTO.RegistracijaKorisnikaDTO;
 import com.example.webshop.error.EmailAlreadyExistsException;
 import com.example.webshop.error.PasswordMismatchException;
 import com.example.webshop.error.UserAlreadyExistsException;
+import com.example.webshop.error.UserNotFoundException;
 import com.example.webshop.model.Korisnik;
 import com.example.webshop.model.PrijavaProfila;
 import com.example.webshop.model.Recenzija;
@@ -75,6 +76,18 @@ public class KorisnikService {
             return null;
         return  korisnik;
 
+    }
+
+    public Optional<Korisnik> findById(Long id) throws UserNotFoundException {
+
+        Optional<Korisnik> korisnik = korisnikRepository.findById(id);
+        if (korisnik.isPresent()) {
+
+            return korisnik;
+        } else {
+
+            throw new UserNotFoundException("Korisnik sa ID-jem " + id + " nije pronađen.");
+        }
     }
 }
 
