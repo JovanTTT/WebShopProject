@@ -89,5 +89,17 @@ public class KorisnikService {
             throw new UserNotFoundException("Korisnik sa ID-jem " + id + " nije pronađen.");
         }
     }
+
+    public Optional<Korisnik> findByKorisnickoIme(String korisnickoIme) throws UserNotFoundException {
+
+        Optional<Korisnik> korisnik = Optional.ofNullable(korisnikRepository.getByKorisnickoIme(korisnickoIme));
+        if (korisnik.isPresent()) {
+
+            return korisnik;
+        } else {
+
+            throw new UserNotFoundException("Korisnik sa korisnickim imenom: " + korisnickoIme + " nije pronađen.");
+        }
+    }
 }
 
