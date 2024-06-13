@@ -1,11 +1,11 @@
 package com.example.webshop.controller;
 
+import com.example.webshop.DTO.KupacDTO;
 import com.example.webshop.DTO.PrijavaKorisnikaDTO;
 import com.example.webshop.DTO.RegistracijaKorisnikaDTO;
-import com.example.webshop.error.EmailAlreadyExistsException;
-import com.example.webshop.error.PasswordMismatchException;
-import com.example.webshop.error.UserAlreadyExistsException;
+import com.example.webshop.error.*;
 import com.example.webshop.model.Korisnik;
+import com.example.webshop.model.Uloga;
 import com.example.webshop.service.KorisnikService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -58,6 +58,34 @@ public class KorisnikController {
 
         session.invalidate();
         return new ResponseEntity("Odjava uspešna.", HttpStatus.OK);
+    }
+
+    @PutMapping("/updateSeller/{id}")
+    public ResponseEntity<?> updateSeller(@PathVariable Long id, @RequestBody KupacDTO updatedSeller, HttpSession session) throws PasswordMismatchException, EmailAlreadyExistsException, UserAlreadyExistsException, UserNotFoundException, NoSellerException {
+
+        Korisnik korisnik = (Korisnik) session.getAttribute("korisnik");
+
+        if(korisnik == null){
+            throw new UserNotFoundException("Samo ulogovani korisnici mogu da menjaju podatke.");
+        }
+
+        Optional<Korisnik> existingUser = korisnikService.findById(id);
+
+        if (existingUser.isEmpty()) {
+            throw new UserNotFoundException("Korisnik sa ID-jem " + id + " nije pronađen.");
+        }
+
+        if (!existingUser.get().getKorisnickoIme().equals(korisnik.getKorisnickoIme())) {
+            throw new NoSellerException("Ne možete menjati podatke drugima.");
+        }
+
+        if(existingUser.get().getUloga() != Uloga.KUPAC){
+            throw new NoSellerException("Samo kupac može da menja podatke.");
+        }
+
+        korisnikService.updateSeller(existingUser.get(), updatedSeller);
+        return ResponseEntity.ok().build();
+
     }
 }
 
