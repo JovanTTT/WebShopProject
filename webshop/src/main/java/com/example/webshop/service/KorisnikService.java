@@ -1,6 +1,7 @@
 package com.example.webshop.service;
 
 import com.example.webshop.DTO.KupacDTO;
+import com.example.webshop.DTO.ProdavacDTO;
 import com.example.webshop.DTO.ProdavacProfilDTO;
 import com.example.webshop.DTO.RegistracijaKorisnikaDTO;
 import com.example.webshop.error.EmailAlreadyExistsException;
@@ -152,6 +153,30 @@ public class KorisnikService {
 
             throw new UserNotFoundException("Korisnik sa korisnickim imenom: " + korisnickoIme + " ne postoji.");
         }
+    }
+
+    public void updateCustomer(Korisnik korisnik, ProdavacDTO updatedCustomer) throws PasswordMismatchException {
+
+        korisnik.setIme(updatedCustomer.getIme());
+        korisnik.setPrezime(updatedCustomer.getPrezime());
+        korisnik.setTelefon(updatedCustomer.getTelefon());
+        korisnik.setUloga(updatedCustomer.getUloga());
+        korisnik.setDatumRodjenja(updatedCustomer.getDatumRodjenja());
+        korisnik.setSlika(updatedCustomer.getSlika());
+        korisnik.setOpisKorisnika(updatedCustomer.getOpisKorisnika());
+
+        if(korisnik.getLozinka().equals(updatedCustomer.getStaraLozinka())){
+
+            korisnik.setMejl(updatedCustomer.getMejl());
+            korisnik.setKorisnickoIme(updatedCustomer.getKorisnickoIme());
+            korisnik.setLozinka(updatedCustomer.getNovaLozinka());
+        }
+        else{
+
+            throw new PasswordMismatchException("Morate uneti ispravnu lozinku.");
+        }
+
+        korisnikRepository.save(korisnik);
     }
 }
 

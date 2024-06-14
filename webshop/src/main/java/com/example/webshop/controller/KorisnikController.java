@@ -1,6 +1,7 @@
 package com.example.webshop.controller;
 
 import com.example.webshop.DTO.KupacDTO;
+import com.example.webshop.DTO.KupacProfilDTO;
 import com.example.webshop.DTO.PrijavaKorisnikaDTO;
 import com.example.webshop.DTO.RegistracijaKorisnikaDTO;
 import com.example.webshop.error.*;
@@ -87,5 +88,7 @@ public class KorisnikController {
         return ResponseEntity.ok().build();
 
     }
+
+
 }
 
