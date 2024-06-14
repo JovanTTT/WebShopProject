@@ -1,6 +1,7 @@
 package com.example.webshop.service;
 
 import com.example.webshop.DTO.KupacDTO;
+import com.example.webshop.DTO.ProdavacProfilDTO;
 import com.example.webshop.DTO.RegistracijaKorisnikaDTO;
 import com.example.webshop.error.EmailAlreadyExistsException;
 import com.example.webshop.error.PasswordMismatchException;
@@ -8,8 +9,10 @@ import com.example.webshop.error.UserAlreadyExistsException;
 import com.example.webshop.error.UserNotFoundException;
 import com.example.webshop.model.Korisnik;
 import com.example.webshop.model.PrijavaProfila;
+import com.example.webshop.model.Prodavac;
 import com.example.webshop.model.Recenzija;
 import com.example.webshop.repository.KorisnikRepository;
+import com.example.webshop.repository.ProdavacRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +23,9 @@ public class KorisnikService {
 
     @Autowired
     private KorisnikRepository korisnikRepository;
+
+    @Autowired
+    private ProdavacRepository prodavacRepository;
 
     public boolean emailExsist(String mejl) {
         return korisnikRepository.existsByMejl(mejl);
@@ -123,6 +129,29 @@ public class KorisnikService {
         }
 
         korisnikRepository.save(korisnik);
+    }
+
+    public ProdavacProfilDTO proveraProdavac(String korisnickoIme) throws UserNotFoundException {
+
+        Optional<Prodavac> korisnik = prodavacRepository.findByKorisnickoIme(korisnickoIme);
+        if (korisnik.isPresent()) {
+
+            ProdavacProfilDTO pp = new ProdavacProfilDTO();
+            pp.setIme(korisnik.get().getIme());
+            pp.setTelefon(korisnik.get().getTelefon());
+            pp.setKorisnickoIme(korisnik.get().getKorisnickoIme());
+            pp.setSlika(korisnik.get().getSlika());
+            pp.setOpisKorisnika(korisnik.get().getOpisKorisnika());
+            pp.setUloga(korisnik.get().getUloga());
+            pp.setBlokiran(korisnik.get().getBlokiran());
+            pp.setDobijeneRecenzije(korisnik.get().getDobijeneRecenzije());
+            pp.setPrezime(korisnik.get().getPrezime());
+            pp.setProsecnaOcena(korisnik.get().getProsecnaOcena());
+            return pp;
+        }else{
+
+            throw new UserNotFoundException("Korisnik sa korisnickim imenom: " + korisnickoIme + " ne postoji.");
+        }
     }
 }
 
