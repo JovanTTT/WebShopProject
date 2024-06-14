@@ -1,9 +1,6 @@
 package com.example.webshop.controller;
 
-import com.example.webshop.DTO.KupacDTO;
-import com.example.webshop.DTO.KupacProfilDTO;
-import com.example.webshop.DTO.PrijavaKorisnikaDTO;
-import com.example.webshop.DTO.RegistracijaKorisnikaDTO;
+import com.example.webshop.DTO.*;
 import com.example.webshop.error.*;
 import com.example.webshop.model.Korisnik;
 import com.example.webshop.model.Uloga;
@@ -89,6 +86,33 @@ public class KorisnikController {
 
     }
 
+    @GetMapping("/profileView/{id}")
+    public ResponseEntity<?> getUser(@PathVariable(name = "id") Long id, HttpSession session) throws UserNotFoundException {
+        Korisnik korisnik = (Korisnik) session.getAttribute("korisnik");
 
+        if(korisnik == null){
+            throw new UserNotFoundException("Niste prijavljeni.");
+        }
+
+        Optional<Korisnik> korisnikOptional = korisnikService.findById(id);
+        if (korisnikOptional.isEmpty()) {
+            throw new UserNotFoundException("Korisnik sa datim ID-om nije pronađen.");
+        }
+
+        if (korisnikOptional.get().getUloga().equals(Uloga.KUPAC)) {
+
+            KupacProfilDTO kupac = korisnikService.getKupacProfile(id);
+            return ResponseEntity.ok(kupac);
+        }
+        else if (korisnikOptional.get().getUloga().equals(Uloga.PRODAVAC)) {
+
+            ProdavacProfilDTO prodavac = korisnikService.getProdavacProfile(id);
+            return ResponseEntity.ok(prodavac);
+        }
+
+        else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Nemate pristup ovom profilu.");
+        }
+    }
 }
 
