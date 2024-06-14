@@ -218,5 +218,53 @@ public class KorisnikService {
             throw new UserNotFoundException("Korisnik sa datim ID-om nije pronađen: " + id);
         }
     }
+
+    public KupacProfilDTO getKupacProfile(Long id) throws UserNotFoundException {
+
+        Optional<Korisnik> korisnikOptional = korisnikRepository.findById(id);
+
+        if (korisnikOptional.isPresent()) {
+
+            Korisnik korisnik = korisnikOptional.get();
+
+            if (korisnik.getUloga().equals(Uloga.KUPAC)) {
+
+                Kupac kupac = (Kupac) korisnik;
+
+                Set<ProizvodiNaProdajuDTO> proizvodiNaProdajuDTO=new HashSet<>();
+
+                for(Proizvod p: kupac.getKupljeniProizvodi()){
+                    ProizvodiNaProdajuDTO proizvodNaProdajuDTO=new ProizvodiNaProdajuDTO();
+                    proizvodNaProdajuDTO.setCena(p.getCena());
+                    proizvodNaProdajuDTO.setNaziv(p.getNaziv());
+                    proizvodNaProdajuDTO.setSlikaProizvoda(p.getSlikaProizvoda());
+                    proizvodNaProdajuDTO.setOpis(p.getOpis());
+                    proizvodiNaProdajuDTO.add(proizvodNaProdajuDTO);
+                }
+                KupacProfilDTO kupacProfilDTO = new KupacProfilDTO();
+                kupacProfilDTO.setIme(korisnik.getIme());
+                kupacProfilDTO.setPrezime(korisnik.getPrezime());
+                kupacProfilDTO.setKorisnickoIme(korisnik.getKorisnickoIme());
+                kupacProfilDTO.setSlika(korisnik.getSlika());
+                kupacProfilDTO.setOpisKorisnika(korisnik.getOpisKorisnika());
+                kupacProfilDTO.setDatumRodjenja(korisnik.getDatumRodjenja());
+
+                Double prosecnaOcena = kupac.getProsecnaOcena();
+                kupacProfilDTO.setProsecnaOcena(prosecnaOcena);
+
+                kupacProfilDTO.setKupljeniProizvodi(proizvodiNaProdajuDTO);
+
+                kupacProfilDTO.setDobijeneRecenzije(korisnikOptional.get().getDobijeneRecenzije());
+
+                return kupacProfilDTO;
+            } else {
+
+                throw new UserNotFoundException("Korisnik sa datim ID-om nije kupac: " + id);
+            }
+        } else {
+
+            throw new UserNotFoundException("Korisnik sa datim ID-om nije pronađen: " + id);
+        }
+    }
 }
 
