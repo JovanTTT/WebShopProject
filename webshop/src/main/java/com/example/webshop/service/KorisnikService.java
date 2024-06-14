@@ -1,17 +1,11 @@
 package com.example.webshop.service;
 
-import com.example.webshop.DTO.KupacDTO;
-import com.example.webshop.DTO.ProdavacDTO;
-import com.example.webshop.DTO.ProdavacProfilDTO;
-import com.example.webshop.DTO.RegistracijaKorisnikaDTO;
+import com.example.webshop.DTO.*;
 import com.example.webshop.error.EmailAlreadyExistsException;
 import com.example.webshop.error.PasswordMismatchException;
 import com.example.webshop.error.UserAlreadyExistsException;
 import com.example.webshop.error.UserNotFoundException;
-import com.example.webshop.model.Korisnik;
-import com.example.webshop.model.PrijavaProfila;
-import com.example.webshop.model.Prodavac;
-import com.example.webshop.model.Recenzija;
+import com.example.webshop.model.*;
 import com.example.webshop.repository.KorisnikRepository;
 import com.example.webshop.repository.ProdavacRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -177,6 +171,52 @@ public class KorisnikService {
         }
 
         korisnikRepository.save(korisnik);
+    }
+
+    public ProdavacProfilDTO getProdavacProfile(Long id) throws UserNotFoundException {
+
+        Optional<Korisnik> korisnikOptional = korisnikRepository.findById(id);
+
+        if (korisnikOptional.isPresent()) {
+
+            Korisnik korisnik = korisnikOptional.get();
+
+            if (korisnik.getUloga().equals(Uloga.PRODAVAC)) {
+
+                Prodavac prodavac = (Prodavac) korisnik;
+                Set<ProizvodiNaProdajuDTO> proizvodiNaProdajuDTO=new HashSet<>();
+
+                for(Proizvod p: prodavac.getProizvodiNaProdaju()){
+                    ProizvodiNaProdajuDTO proizvodNaProdajuDTO=new ProizvodiNaProdajuDTO();
+                    proizvodNaProdajuDTO.setCena(p.getCena());
+                    proizvodNaProdajuDTO.setNaziv(p.getNaziv());
+                    proizvodNaProdajuDTO.setSlikaProizvoda(p.getSlikaProizvoda());
+                    proizvodNaProdajuDTO.setOpis(p.getOpis());
+                    proizvodiNaProdajuDTO.add(proizvodNaProdajuDTO);
+                }
+                ProdavacProfilDTO prodavacProfilDTO = new ProdavacProfilDTO();
+                prodavacProfilDTO.setIme(korisnik.getIme());
+                prodavacProfilDTO.setPrezime(korisnik.getPrezime());
+                prodavacProfilDTO.setKorisnickoIme(korisnik.getKorisnickoIme());
+                prodavacProfilDTO.setTelefon(korisnik.getTelefon());
+                prodavacProfilDTO.setSlika(korisnik.getSlika());
+                prodavacProfilDTO.setOpisKorisnika(korisnik.getOpisKorisnika());
+                prodavacProfilDTO.setUloga(korisnik.getUloga());
+                prodavacProfilDTO.setBlokiran(korisnik.getBlokiran());
+                prodavacProfilDTO.setProizvodiNaProdaju(proizvodiNaProdajuDTO);
+                prodavacProfilDTO.setDobijeneRecenzije(korisnikOptional.get().getDobijeneRecenzije());
+                prodavacProfilDTO.setProsecnaOcena(prodavac.getProsecnaOcena());
+
+
+                return  prodavacProfilDTO;
+            } else {
+
+                throw new UserNotFoundException("Korisnik sa datim ID-om nije prodavac " + id);
+            }
+        } else {
+
+            throw new UserNotFoundException("Korisnik sa datim ID-om nije pronađen: " + id);
+        }
     }
 }
 
