@@ -114,5 +114,35 @@ public class KorisnikController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Nemate pristup ovom profilu.");
         }
     }
+
+    @PutMapping("/updateCustomer/{id}")
+    public ResponseEntity<?> updateCustomer(@PathVariable Long id, @RequestBody ProdavacDTO updatedCustomer, HttpSession session) throws PasswordMismatchException, EmailAlreadyExistsException, UserAlreadyExistsException, UserNotFoundException, NoSellerException, NoCustomerException {
+
+        Korisnik korisnik = (Korisnik) session.getAttribute("korisnik");
+
+        if(korisnik == null){
+            // return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            throw new UserNotFoundException("Samo ulogovani korisnici mogu da menjaju podatke.");
+        }
+
+        Optional<Korisnik> existingUser = korisnikService.findById(id);
+
+        if (existingUser.isEmpty()) {
+            // return ResponseEntity.notFound().build();
+            throw new UserNotFoundException("Korisnik sa ID-jem " + id + " nije pronađen.");
+        }
+
+        if (!existingUser.get().getKorisnickoIme().equals(korisnik.getKorisnickoIme())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        if(existingUser.get().getUloga() != Uloga.PRODAVAC){
+            throw new NoCustomerException("Samo PRODAVAC moze da menja podatke.");
+        }
+
+        korisnikService.updateCustomer(existingUser.get(), updatedCustomer);
+        return ResponseEntity.ok().build();
+
+    }
 }
 
