@@ -144,5 +144,22 @@ public class KorisnikController {
         return ResponseEntity.ok().build();
 
     }
+
+    @PostMapping("/rateSeller/{prodavacId}")
+    public ProdavacOceneDTO oceniProdavca(@PathVariable Long prodavacId, @RequestParam int ocena, @RequestParam String komentar, HttpSession session) throws UserNotFoundException {
+
+        Korisnik korisnik = (Korisnik) session.getAttribute("korisnik");
+
+        if (korisnik == null) {
+            throw new UserNotFoundException("Samo ulogovani korisnici mogu da ocenjuju druge korisnike.");
+        }
+
+        if (!korisnikService.jeKupacKupioOdProdavca(korisnik.getId(), prodavacId)) {
+            throw new UserNotFoundException("Kupac može da oceni prodavca samo ako je kupio proizvod od tog prodavca.");
+
+        }
+        return korisnikService.oceniProdavca(korisnik.getId(), prodavacId, ocena, komentar);
+
+    }
 }
 
