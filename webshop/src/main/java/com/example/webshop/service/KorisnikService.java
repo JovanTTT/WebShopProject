@@ -8,6 +8,7 @@ import com.example.webshop.error.UserNotFoundException;
 import com.example.webshop.model.*;
 import com.example.webshop.repository.KorisnikRepository;
 import com.example.webshop.repository.ProdavacRepository;
+import com.example.webshop.repository.ProizvodRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,9 +19,10 @@ public class KorisnikService {
 
     @Autowired
     private KorisnikRepository korisnikRepository;
-
     @Autowired
     private ProdavacRepository prodavacRepository;
+    @Autowired
+    private ProizvodRepository proizvodRepository;
 
     public boolean emailExsist(String mejl) {
         return korisnikRepository.existsByMejl(mejl);
@@ -265,6 +267,12 @@ public class KorisnikService {
 
             throw new UserNotFoundException("Korisnik sa datim ID-om nije pronađen: " + id);
         }
+    }
+
+    public boolean jeKupacKupioOdProdavca(Long kupacId, Long prodavacId) {
+
+        List<Proizvod> proizvodi = proizvodRepository.findAllByKupacIdAndProdavacId(kupacId, prodavacId);
+        return !proizvodi.isEmpty();
     }
 }
 
