@@ -9,6 +9,7 @@ import com.example.webshop.model.*;
 import com.example.webshop.repository.KorisnikRepository;
 import com.example.webshop.repository.ProdavacRepository;
 import com.example.webshop.repository.ProizvodRepository;
+import com.example.webshop.repository.RecenzijaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,8 @@ public class KorisnikService {
     private ProdavacRepository prodavacRepository;
     @Autowired
     private ProizvodRepository proizvodRepository;
+    @Autowired
+    private RecenzijaRepository recenzijaRepository;
 
     public boolean emailExsist(String mejl) {
         return korisnikRepository.existsByMejl(mejl);
@@ -273,6 +276,42 @@ public class KorisnikService {
 
         List<Proizvod> proizvodi = proizvodRepository.findAllByKupacIdAndProdavacId(kupacId, prodavacId);
         return !proizvodi.isEmpty();
+    }
+
+    public ProdavacOceneDTO oceniProdavca(Long kupacId, Long prodavacId, int ocena, String komentar) {
+
+        Prodavac prodavac = prodavacRepository.findById(prodavacId).get();
+
+        String kupacKorisnickoIme = korisnikRepository.findById(kupacId).map(Korisnik::getKorisnickoIme).orElse(null);
+
+        prodavac.getOcene().put(kupacKorisnickoIme, ocena);
+        prodavac.getKomentari().put(kupacKorisnickoIme, komentar);
+
+        double prosecnaOcena = prodavac.getOcene().values().stream().mapToInt(Integer::intValue).average().orElse(prodavac.getProsecnaOcena());
+        prodavac.setProsecnaOcena(prosecnaOcena);
+        prodavac = prodavacRepository.save(prodavac);
+
+        Date d = new Date();
+
+        Korisnik k = korisnikRepository.getByKorisnickoIme(kupacKorisnickoIme);
+        Recenzija recenzija = new Recenzija();
+        recenzija.setKorisnikKojiJeDaoRecenziju(k);
+        recenzija.setKorisnikKojiJeDobioRecenziju(prodavac);
+        recenzija.setDatumRecenzije(d);
+        recenzija.setOcena(ocena);
+        recenzija.setKomentar(komentar);
+        recenzijaRepository.save(recenzija);
+
+        ProdavacOceneDTO prodavacDTO = new ProdavacOceneDTO();
+        prodavacDTO.setIme(prodavac.getIme());
+        prodavacDTO.setPrezime(prodavac.getPrezime());
+        prodavacDTO.setKorisnickoIme(prodavac.getKorisnickoIme());
+        prodavacDTO.setSlika(prodavac.getSlika());
+        prodavacDTO.setOcene(prodavac.getOcene());
+        prodavacDTO.setKomentari(prodavac.getKomentari());
+        prodavacDTO.setProsecnaOcena(prodavac.getProsecnaOcena());
+
+        return prodavacDTO;
     }
 }
 
