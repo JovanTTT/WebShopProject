@@ -313,5 +313,11 @@ public class KorisnikService {
 
         return prodavacDTO;
     }
+
+    public double izracunajProsecnuOcenu(Long prodavacId) {
+
+        Prodavac prodavac = prodavacRepository.findById(prodavacId).get();
+        return prodavac.getOcene().values().stream().mapToInt(Integer::intValue).average().orElse(prodavac.getProsecnaOcena());
+    }
 }
 
