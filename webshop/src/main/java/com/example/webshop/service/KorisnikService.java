@@ -319,5 +319,11 @@ public class KorisnikService {
         Prodavac prodavac = prodavacRepository.findById(prodavacId).get();
         return prodavac.getOcene().values().stream().mapToInt(Integer::intValue).average().orElse(prodavac.getProsecnaOcena());
     }
+
+    public boolean jeProdavacProdaoKupcu(Long prodavacId, Long kupacId) {
+
+        List<Proizvod> proizvodi = proizvodRepository.findAllByProdavacIdAndKupacId(prodavacId, kupacId);
+        return !proizvodi.isEmpty();
+    }
 }
 
