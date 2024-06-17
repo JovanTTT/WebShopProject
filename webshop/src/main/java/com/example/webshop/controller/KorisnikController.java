@@ -194,5 +194,21 @@ public class KorisnikController {
 
         return korisnikService.oceniKupca(korisnik.getId(), kupacId, ocena, komentar);
     }
+
+    @GetMapping("/averageRatingBuyer/{kupacId}")
+    public double prosecnaOcenaKupca (@PathVariable Long kupacId, HttpSession session) throws UserNotFoundException, NoSellerException {
+        Korisnik korisnik = (Korisnik) session.getAttribute("korisnik");
+
+        if (korisnik == null) {
+            throw new UserNotFoundException("Samo ulogovanik korisnici mogu da vide prosecne ocene drugih prodavaca!");
+        }
+
+        Optional<Korisnik> kupac = korisnikService.findById(kupacId);
+        if(kupac.get().getUloga() != Uloga.KUPAC){
+            throw  new NoSellerException("Korisnik sa zeljenim ID-jem nije kupac!");
+        }
+
+        return korisnikService.izracunajProsecnuOcenuKupca(kupacId);
+    }
 }
 
