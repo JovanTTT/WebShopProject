@@ -364,5 +364,12 @@ public class KorisnikService {
 
         return kupacDTO;
     }
+
+    public double izracunajProsecnuOcenuKupca(Long kupacId) {
+        // izračunaj prosečnu ocenu za kupca
+        Kupac kupac = kupacRepository.findById(kupacId).get();
+
+        return kupac.getOcene().values().stream().mapToInt(Integer::intValue).average().orElse(kupac.getProsecnaOcena());
+    }
 }
 
