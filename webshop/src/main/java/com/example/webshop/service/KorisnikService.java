@@ -6,10 +6,7 @@ import com.example.webshop.error.PasswordMismatchException;
 import com.example.webshop.error.UserAlreadyExistsException;
 import com.example.webshop.error.UserNotFoundException;
 import com.example.webshop.model.*;
-import com.example.webshop.repository.KorisnikRepository;
-import com.example.webshop.repository.ProdavacRepository;
-import com.example.webshop.repository.ProizvodRepository;
-import com.example.webshop.repository.RecenzijaRepository;
+import com.example.webshop.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +23,8 @@ public class KorisnikService {
     private ProizvodRepository proizvodRepository;
     @Autowired
     private RecenzijaRepository recenzijaRepository;
+    @Autowired
+    private KupacRepository kupacRepository;
 
     public boolean emailExsist(String mejl) {
         return korisnikRepository.existsByMejl(mejl);
@@ -324,6 +323,46 @@ public class KorisnikService {
 
         List<Proizvod> proizvodi = proizvodRepository.findAllByProdavacIdAndKupacId(prodavacId, kupacId);
         return !proizvodi.isEmpty();
+    }
+
+    public KupacOcenaDTO oceniKupca(Long prodavacId, Long kupacId, int ocena, String komentar) {
+
+        Kupac kupac = kupacRepository.findById(kupacId).get();
+
+
+        String prodavacKorisnickoIme = korisnikRepository.findById(prodavacId).map(Korisnik::getKorisnickoIme).orElse(null);
+
+        kupac.getOcene().put(prodavacKorisnickoIme, ocena);
+        kupac.getKomentari().put(prodavacKorisnickoIme, komentar);
+
+        double prosecnaOcena = kupac.getOcene().values().stream().mapToInt(Integer::intValue).average().orElse(kupac.getProsecnaOcena());
+        kupac.setProsecnaOcena(prosecnaOcena);
+        kupac = kupacRepository.save(kupac);
+
+
+        Date d = new Date();
+
+
+        Prodavac p = prodavacRepository.findProdavacByKorisnickoIme(prodavacKorisnickoIme);
+        Recenzija recenzija = new Recenzija();
+        recenzija.setKorisnikKojiJeDaoRecenziju(p);
+        recenzija.setKorisnikKojiJeDobioRecenziju(kupac);
+        recenzija.setDatumRecenzije(d);
+        recenzija.setOcena(ocena);
+        recenzija.setKomentar(komentar);
+        recenzijaRepository.save(recenzija);
+
+
+        KupacOcenaDTO kupacDTO = new KupacOcenaDTO();
+        kupacDTO.setIme(kupac.getIme());
+        kupacDTO.setPrezime(kupac.getPrezime());
+        kupacDTO.setKorisnickoIme(kupac.getKorisnickoIme());
+        kupacDTO.setSlika(kupac.getSlika());
+        kupacDTO.setOcene(kupac.getOcene());
+        kupacDTO.setKomentari(kupac.getKomentari());
+        kupacDTO.setProsecnaOcena(kupac.getProsecnaOcena());
+
+        return kupacDTO;
     }
 }
 
