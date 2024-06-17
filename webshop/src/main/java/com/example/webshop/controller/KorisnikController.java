@@ -177,5 +177,22 @@ public class KorisnikController {
 
         return korisnikService.izracunajProsecnuOcenu(prodavacId);
     }
+
+    @PostMapping("/rateBuyer/{kupacId}")
+    public KupacOcenaDTO oceniKupca (@PathVariable Long kupacId,@RequestParam int ocena,
+                                     @RequestParam String komentar, HttpSession session) throws UserNotFoundException {
+
+        Korisnik korisnik = (Korisnik) session.getAttribute("korisnik");
+
+        if (korisnik == null) {
+            throw new UserNotFoundException("Samo ulogovani korisnici mogu da ocenjuju druge korisnike.");
+        }
+
+        if (!korisnikService.jeProdavacProdaoKupcu(korisnik.getId(), kupacId)) {
+            throw new UserNotFoundException("Prodavac može da oceni kupca samo ako je prodao proizvod tom kupcu.");
+        }
+
+        return korisnikService.oceniKupca(korisnik.getId(), kupacId, ocena, komentar);
+    }
 }
 
