@@ -228,5 +228,22 @@ public class KorisnikController {
         List<RecenzijaPrikazDTO> recenzije = korisnikService.vratiRecenzijeKupac(korisnik.getId());
         return new ResponseEntity<>(recenzije, HttpStatus.OK);
     }
+
+    @GetMapping("/reviewedSellers/received")
+    public ResponseEntity<List<RecenzijaPrikazDTO>> getReviewsFromReviewedSellers (HttpSession session) throws
+            UserNotFoundException, NoSellerException {
+
+        Korisnik korisnik = (Korisnik) session.getAttribute("korisnik");
+
+        if (korisnik == null) {
+            throw new UserNotFoundException("Samo ulogovani korisnici mogu da pregledaju recenzije.");
+        }
+
+        if (!korisnik.getUloga().equals(Uloga.KUPAC)) {
+            throw new NoSellerException("Samo kupac može da pregleda recenzije.");
+        }
+        List<RecenzijaPrikazDTO> recenzije = korisnikService.vratiRecenzijeOdProdavacaKojimaJeKupacDaoRecenziju(korisnik.getId());
+        return new ResponseEntity<>(recenzije, HttpStatus.OK);
+    }
 }
 
