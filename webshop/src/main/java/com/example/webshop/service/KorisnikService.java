@@ -525,5 +525,16 @@ public class KorisnikService {
 
         return recenzije;
     }
+
+    public void deleteReview(Long reviewId) throws UserNotFoundException {
+        if(!recenzijaRepository.existsById(reviewId))
+            throw new UserNotFoundException("Recenzija koja ima id " + reviewId + " ne postoji.");
+        if(recenzijaRepository.existsById(reviewId)) {
+            recenzijaRepository.deleteById(reviewId);
+            System.out.println("Recenzija sa ID " + reviewId + " je obrisana.");
+        } else {
+            System.out.println("Recenzija sa ID " + reviewId + " ne postoji.");
+        }
+    }
 }
 
