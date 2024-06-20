@@ -279,5 +279,20 @@ public class KorisnikController {
         List<RecenzijaPrikaz3DTO> recenzije = korisnikService.vratiRecenzijeAdministrator(korisnik.getId());
         return new ResponseEntity<>(recenzije, HttpStatus.OK);
     }
+
+    @DeleteMapping("/deleteReview/{reviewId}")
+    public ResponseEntity<?> deleteReview (@PathVariable Long reviewId, HttpSession session) throws
+            UserNotFoundException, NoSellerException {
+        Korisnik korisnik = (Korisnik) session.getAttribute("korisnik");
+        if (korisnik == null) {
+            throw new UserNotFoundException("Samo ulogovani korisnici mogu da menjaju podatke.");
+        }
+
+        if (!korisnik.getUloga().equals(Uloga.ADMINISTRATOR)) {
+            throw new NoSellerException("Samo administrator može da modifikuje recenzije.");
+        }
+        korisnikService.deleteReview(reviewId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
 
