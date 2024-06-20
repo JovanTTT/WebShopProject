@@ -263,6 +263,21 @@ public class KorisnikController {
         return new ResponseEntity<>(recenzije, HttpStatus.OK);
     }
 
+    @GetMapping("/reviews/admin")
+    public ResponseEntity<List<RecenzijaPrikaz3DTO>> getAllReviews (HttpSession session) throws
+            UserNotFoundException, NoSellerException {
+        Korisnik korisnik = (Korisnik) session.getAttribute("korisnik");
 
+        if (korisnik == null) {
+            throw new UserNotFoundException("Samo ulogovani korisnici mogu da pregledaju recenzije!");
+        }
+
+        if (!korisnik.getUloga().equals(Uloga.ADMINISTRATOR)) {
+            throw new NoSellerException("Samo ADMINISTRATOR moze da pregleda recenzije!");
+        }
+
+        List<RecenzijaPrikaz3DTO> recenzije = korisnikService.vratiRecenzijeAdministrator(korisnik.getId());
+        return new ResponseEntity<>(recenzije, HttpStatus.OK);
+    }
 }
 
