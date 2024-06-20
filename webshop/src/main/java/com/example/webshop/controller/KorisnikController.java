@@ -262,5 +262,7 @@ public class KorisnikController {
         List<RecenzijaPrikaz2DTO> recenzije = korisnikService.vratiRecenzijeOdKupcaAkoJeProdavacDaoRecenziju(korisnik.getId());
         return new ResponseEntity<>(recenzije, HttpStatus.OK);
     }
+
+
 }
 

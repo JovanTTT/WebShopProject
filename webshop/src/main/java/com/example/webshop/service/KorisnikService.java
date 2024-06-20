@@ -491,5 +491,39 @@ public class KorisnikService {
 
         return recenzije;
     }
+
+    public List<RecenzijaPrikaz3DTO> vratiRecenzijeAdministrator(Long administratorId){
+        Korisnik administrator = korisnikRepository.findById(administratorId).get();
+        List<Recenzija> sveRecenzije = recenzijaRepository.findAll();
+
+        List<RecenzijaPrikaz3DTO> recenzije = new ArrayList<>();
+        for(Recenzija recenzija : sveRecenzije) {
+            RecenzijaPrikaz3DTO dto = new RecenzijaPrikaz3DTO();
+
+            dto.setOcena(recenzija.getOcena());
+            dto.setKomentar(recenzija.getKomentar());
+            dto.setDatumPodnosenjaRecenzije(recenzija.getDatumRecenzije());
+
+            Korisnik kupac = recenzija.getKorisnikKojiJeDaoRecenziju();
+            Korisnik prodavac = recenzija.getKorisnikKojiJeDobioRecenziju();
+
+            KupacPrikazRecenzijeDTO kupacDto = new KupacPrikazRecenzijeDTO();
+            kupacDto.setIme(kupac.getIme());
+            kupacDto.setPrezime(kupac.getPrezime());
+            kupacDto.setKorisnickoIme(kupac.getKorisnickoIme());
+
+            ProdavacPrikazRecenzijeDTO prodavacDto = new ProdavacPrikazRecenzijeDTO();
+            prodavacDto.setIme(prodavac.getIme());
+            prodavacDto.setPrezime(prodavac.getPrezime());
+            prodavacDto.setKorisnickoIme(prodavac.getKorisnickoIme());
+
+            dto.setRecenzijuPodneo(kupacDto);
+            dto.setRecenzijuPrimio(prodavacDto);
+
+            recenzije.add(dto);
+        }
+
+        return recenzije;
+    }
 }
 
