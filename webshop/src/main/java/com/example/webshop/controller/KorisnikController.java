@@ -3,6 +3,7 @@ package com.example.webshop.controller;
 import com.example.webshop.DTO.*;
 import com.example.webshop.error.*;
 import com.example.webshop.model.Korisnik;
+import com.example.webshop.model.Recenzija;
 import com.example.webshop.model.Uloga;
 import com.example.webshop.service.KorisnikService;
 import jakarta.servlet.http.HttpSession;
@@ -293,6 +294,22 @@ public class KorisnikController {
         }
         korisnikService.deleteReview(reviewId);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping("/updateReview/{reviewId}")
+    public ResponseEntity<Recenzija> updateReviewComment (@PathVariable Long reviewId, RecenzijaPrikaz3DTO recenzija, HttpSession session) throws
+            ResourceNotFoundException, UserNotFoundException, NoSellerException {
+        Korisnik korisnik = (Korisnik) session.getAttribute("korisnik");
+        if (korisnik == null) {
+            throw new UserNotFoundException("Samo ulogovani korisnici mogu da menjaju podatke.");
+        }
+
+        if (!korisnik.getUloga().equals(Uloga.ADMINISTRATOR)) {
+            throw new NoSellerException("Samo administrator može da modifikuje recenzije.");
+        }
+
+        Recenzija updatedReview = korisnikService.updateReview(reviewId, recenzija);
+        return new ResponseEntity<>(updatedReview, HttpStatus.OK);
     }
 }
 
