@@ -311,5 +311,19 @@ public class KorisnikController {
         Recenzija updatedReview = korisnikService.updateReview(reviewId, recenzija);
         return new ResponseEntity<>(updatedReview, HttpStatus.OK);
     }
+
+    @GetMapping("/currentUser")
+    public ResponseEntity<?> getCurrentUser(HttpSession session) throws UserNotFoundException{
+
+        Korisnik korisnik = (Korisnik) session.getAttribute("korisnik");
+
+        Optional<Korisnik> trenutniKorisnik = korisnikService.findById(korisnik.getId());
+
+        if (trenutniKorisnik == null) {
+            throw new UserNotFoundException("Samo ulogovani korisnici mogu da pristupe ovoj funkciji.");
+        }
+
+        return ResponseEntity.ok(trenutniKorisnik);
+    }
 }
 
