@@ -1,10 +1,7 @@
 package com.example.webshop.service;
 
 import com.example.webshop.DTO.*;
-import com.example.webshop.error.EmailAlreadyExistsException;
-import com.example.webshop.error.PasswordMismatchException;
-import com.example.webshop.error.UserAlreadyExistsException;
-import com.example.webshop.error.UserNotFoundException;
+import com.example.webshop.error.*;
 import com.example.webshop.model.*;
 import com.example.webshop.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -535,6 +532,17 @@ public class KorisnikService {
         } else {
             System.out.println("Recenzija sa ID " + reviewId + " ne postoji.");
         }
+    }
+
+    public Recenzija updateReview(Long reviewId, RecenzijaPrikaz3DTO updatedReview) throws ResourceNotFoundException {
+        Recenzija existingReview = recenzijaRepository.findById(reviewId)
+                .orElseThrow(() -> new ResourceNotFoundException("Recenzija sa ID " + reviewId + " nije pronađena"));
+
+        existingReview.setOcena(updatedReview.getOcena());
+        existingReview.setKomentar(updatedReview.getKomentar());
+        // Postavite ostale atribute koje želite da izmenite
+
+        return recenzijaRepository.save(existingReview);
     }
 }
 
