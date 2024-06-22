@@ -2,15 +2,14 @@ package com.example.webshop.service;
 
 import com.example.webshop.DTO.KategorijaDTO;
 import com.example.webshop.DTO.ProizvodDTO;
+import com.example.webshop.DTO.SviProizvodiDTO;
 import com.example.webshop.model.Kategorija;
 import com.example.webshop.model.Proizvod;
 import com.example.webshop.repository.ProizvodRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class ProizvodService {
@@ -48,4 +47,32 @@ public class ProizvodService {
         return null;
     }
 
+    public List<SviProizvodiDTO> findAllProducts() {
+
+        List<Proizvod> proizvodi = proizvodRepository.findAll();
+        List<SviProizvodiDTO> proizvodiDTO = new ArrayList<>();
+        List<Proizvod> slanje = new ArrayList<>();
+
+        for (Proizvod proizvod : proizvodi) {
+            SviProizvodiDTO proizvodDTO = new SviProizvodiDTO();
+            proizvodDTO.setId(proizvod.getId());
+            proizvodDTO.setNaziv(proizvod.getNaziv());
+            proizvodDTO.setOpis(proizvod.getOpis());
+            proizvodDTO.setSlikaProizvoda(proizvod.getSlikaProizvoda());
+            proizvodDTO.setCena(proizvod.getCena());
+            proizvodDTO.setTipProdaje(proizvod.getTipProdaje());
+            Set< Kategorija> kategorije=proizvod.getKategorija();
+            Set<KategorijaDTO> kategorijeDTO=new HashSet<>();
+            for(Kategorija kategorija: kategorije){
+                KategorijaDTO kategorijaDTO= new KategorijaDTO();
+                kategorijaDTO.setNazivKategorije(kategorija.getNazivKategorije());
+                kategorijaDTO.setId(kategorija.getId());
+                kategorijeDTO.add(kategorijaDTO);
+            }
+
+            proizvodDTO.setKategorije(kategorijeDTO);
+            proizvodiDTO.add(proizvodDTO);
+        }
+        return proizvodiDTO;
+    }
 }
