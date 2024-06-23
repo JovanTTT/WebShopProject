@@ -7,6 +7,9 @@ import com.example.webshop.model.Kategorija;
 import com.example.webshop.model.Proizvod;
 import com.example.webshop.repository.ProizvodRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -88,6 +91,35 @@ public class ProizvodService {
             proizvodDTO.setNaziv(proizvod.getNaziv());
             proizvodDTO.setOpis(proizvod.getOpis());
             proizvodDTO.setSlikaProizvoda(proizvod.getSlikaProizvoda());
+            proizvodiDTO.add(proizvodDTO);
+        }
+        return proizvodiDTO;
+    }
+
+    public List<ProizvodDTO> findAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Proizvod> proizvodiPage = proizvodRepository.findAll(pageable);
+
+        List<ProizvodDTO> proizvodiDTO = new ArrayList<>();
+        for (Proizvod proizvod : proizvodiPage.getContent()) {
+            ProizvodDTO proizvodDTO = new ProizvodDTO();
+            proizvodDTO.setId(proizvod.getId());
+            proizvodDTO.setNaziv(proizvod.getNaziv());
+            proizvodDTO.setOpis(proizvod.getOpis());
+            proizvodDTO.setSlikaProizvoda(proizvod.getSlikaProizvoda());
+            proizvodDTO.setCena(proizvod.getCena());
+            proizvodDTO.setTipProdaje(proizvod.getTipProdaje());
+            Set< Kategorija> kategorije=proizvod.getKategorija();
+            Set<KategorijaDTO> kategorijeDTO=new HashSet<>();
+            for(Kategorija kategorija: kategorije){
+                KategorijaDTO kategorijaDTO= new KategorijaDTO();
+                kategorijaDTO.setNazivKategorije(kategorija.getNazivKategorije());
+                kategorijaDTO.setId(kategorija.getId());
+                kategorijeDTO.add(kategorijaDTO);
+            }
+
+            proizvodDTO.setKategorije(kategorijeDTO);
+            // Postaviti ostale atribute po potrebi
             proizvodiDTO.add(proizvodDTO);
         }
         return proizvodiDTO;
