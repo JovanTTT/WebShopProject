@@ -27,4 +27,6 @@ public class SviProizvodiDTO {
     private Double cena;
 
     private TipProdaje tipProdaje;
+
+    private ProdavacProfilDTO prodavac;
 }

@@ -15,6 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProdavacProfilDTO {
+    private Long id;
 
     private String ime;
 

@@ -1,9 +1,8 @@
 package com.example.webshop.service;
 
-import com.example.webshop.DTO.KategorijaDTO;
-import com.example.webshop.DTO.ProizvodDTO;
-import com.example.webshop.DTO.SviProizvodiDTO;
+import com.example.webshop.DTO.*;
 import com.example.webshop.model.Kategorija;
+import com.example.webshop.model.Prodavac;
 import com.example.webshop.model.Proizvod;
 import com.example.webshop.repository.ProizvodRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,5 +122,57 @@ public class ProizvodService {
             proizvodiDTO.add(proizvodDTO);
         }
         return proizvodiDTO;
+    }
+
+    public SviProizvodiDTO findProduct(Long id) {
+        Optional<Proizvod> foundProizvod = proizvodRepository.findById(id);
+
+        if (foundProizvod.isPresent()) {
+
+            Proizvod proizvod=foundProizvod.get();
+            SviProizvodiDTO proizvodDTO=new SviProizvodiDTO();
+            proizvodDTO.setNaziv(proizvod.getNaziv());
+            proizvodDTO.setCena(proizvod.getCena());
+            proizvodDTO.setTipProdaje(proizvod.getTipProdaje());
+            proizvodDTO.setSlikaProizvoda(proizvod.getSlikaProizvoda());
+            proizvodDTO.setOpis(proizvod.getOpis());
+            proizvodDTO.setId(proizvod.getId());
+            Prodavac p=proizvod.getProdavac();
+            ProdavacProfilDTO prodavacProfilDTO=new ProdavacProfilDTO();
+            prodavacProfilDTO.setId(p.getId());
+            prodavacProfilDTO.setIme(p.getIme());
+            prodavacProfilDTO.setPrezime(p.getPrezime());
+            prodavacProfilDTO.setBlokiran(p.getBlokiran());
+            prodavacProfilDTO.setKorisnickoIme(p.getKorisnickoIme());
+            prodavacProfilDTO.setSlika(p.getSlika());
+            prodavacProfilDTO.setTelefon(p.getTelefon());
+            prodavacProfilDTO.setDobijeneRecenzije(p.getDobijeneRecenzije());
+            prodavacProfilDTO.setOpisKorisnika(p.getOpisKorisnika());
+            prodavacProfilDTO.setProsecnaOcena(p.getProsecnaOcena());
+
+            Set<ProizvodiNaProdajuDTO> proizvodiNaProdajuDTO = new HashSet<>();
+            for (Proizvod prodNaProdaju : p.getProizvodiNaProdaju()) {
+                ProizvodiNaProdajuDTO prodDTO = new ProizvodiNaProdajuDTO();
+                prodDTO.setNaziv(prodNaProdaju.getNaziv());
+                prodDTO.setCena(prodNaProdaju.getCena());
+                // Dodajte ostala potrebna polja
+                proizvodiNaProdajuDTO.add(prodDTO);
+            }
+            prodavacProfilDTO.setProizvodiNaProdaju(proizvodiNaProdajuDTO);
+
+            proizvodDTO.setProdavac(prodavacProfilDTO);
+            Set< Kategorija> kategorije=proizvod.getKategorija();
+            Set<KategorijaDTO> kategorijeDTO=new HashSet<>();
+            for(Kategorija kategorija: kategorije){
+                KategorijaDTO kategorijaDTO= new KategorijaDTO();
+                kategorijaDTO.setNazivKategorije(kategorija.getNazivKategorije());
+                kategorijaDTO.setId(kategorija.getId());
+                kategorijeDTO.add(kategorijaDTO);
+            }
+
+            proizvodDTO.setKategorije(kategorijeDTO);
+            return proizvodDTO;
+        }
+        return null;
     }
 }
