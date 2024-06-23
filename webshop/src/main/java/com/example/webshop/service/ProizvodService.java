@@ -75,4 +75,21 @@ public class ProizvodService {
         }
         return proizvodiDTO;
     }
+
+    public List<ProizvodDTO> findAll() {
+
+        List<Proizvod> proizvodi = proizvodRepository.findAll();
+        List<ProizvodDTO> proizvodiDTO = new ArrayList<>();
+        List<Proizvod> slanje = new ArrayList<>();
+
+        for (Proizvod proizvod : proizvodi) {
+            ProizvodDTO proizvodDTO = new ProizvodDTO();
+            proizvodDTO.setId(proizvod.getId());
+            proizvodDTO.setNaziv(proizvod.getNaziv());
+            proizvodDTO.setOpis(proizvod.getOpis());
+            proizvodDTO.setSlikaProizvoda(proizvod.getSlikaProizvoda());
+            proizvodiDTO.add(proizvodDTO);
+        }
+        return proizvodiDTO;
+    }
 }
