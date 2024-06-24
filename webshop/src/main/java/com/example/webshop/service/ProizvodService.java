@@ -1,6 +1,7 @@
 package com.example.webshop.service;
 
 import com.example.webshop.DTO.*;
+import com.example.webshop.error.ProductNotFoundException;
 import com.example.webshop.model.Kategorija;
 import com.example.webshop.model.Prodavac;
 import com.example.webshop.model.Proizvod;
@@ -174,5 +175,38 @@ public class ProizvodService {
             return proizvodDTO;
         }
         return null;
+    }
+
+    public List<ProizvodDTO> findByNazivAndOpis(String name, String description) throws ProductNotFoundException {
+
+        List<Proizvod> proizvodi = proizvodRepository.findByNazivAndOpis(name, description);
+        List<ProizvodDTO> proizvodiDTO = new ArrayList<>();
+        for(Proizvod proizvod: proizvodi){
+            ProizvodDTO proizvodDTO = new ProizvodDTO();
+            proizvodDTO.setId(proizvod.getId());
+            proizvodDTO.setNaziv(proizvod.getNaziv());
+            proizvodDTO.setOpis(proizvod.getOpis());
+            proizvodDTO.setSlikaProizvoda(proizvod.getSlikaProizvoda());
+            proizvodDTO.setCena(proizvod.getCena());
+            proizvodDTO.setTipProdaje(proizvod.getTipProdaje());
+            Set< Kategorija> kategorije=proizvod.getKategorija();
+            Set<KategorijaDTO> kategorijeDTO=new HashSet<>();
+            for(Kategorija kategorija: kategorije){
+                KategorijaDTO kategorijaDTO= new KategorijaDTO();
+                kategorijaDTO.setNazivKategorije(kategorija.getNazivKategorije());
+                kategorijaDTO.setId(kategorija.getId());
+                kategorijeDTO.add(kategorijaDTO);
+            }
+
+            proizvodDTO.setKategorije(kategorijeDTO);
+            proizvodiDTO.add(proizvodDTO);
+        }
+        if (proizvodiDTO.isEmpty()) {
+
+            throw new ProductNotFoundException("Trazeni proizvod ne postoji.");
+        }
+        return proizvodiDTO;
+
+
     }
 }
