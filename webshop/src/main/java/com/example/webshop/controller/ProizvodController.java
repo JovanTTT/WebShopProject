@@ -1,6 +1,8 @@
 package com.example.webshop.controller;
 
+import com.example.webshop.DTO.ProizvodDTO;
 import com.example.webshop.DTO.SviProizvodiDTO;
+import com.example.webshop.error.PasswordMismatchException;
 import com.example.webshop.error.ProductNotFoundException;
 import com.example.webshop.model.Proizvod;
 import com.example.webshop.service.ProizvodService;
@@ -11,7 +13,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -38,5 +42,24 @@ public class ProizvodController {
             throw new ProductNotFoundException("Traženi proizvod ne postoji.");
         }
         return proizvodService.findProduct(id);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ProizvodDTO>> searchProducts(@RequestParam(required = false) String name, @RequestParam(required = false) String description) throws ProductNotFoundException, PasswordMismatchException, PasswordMismatchException {
+
+        List<ProizvodDTO> proizvod = new ArrayList<>();
+        if (name != null && description != null) {
+            proizvod = proizvodService.findByNazivAndOpis(name, description);
+
+        } else if (name != null) {
+            proizvod = proizvodService.findByNaziv(name);
+
+        } else if (description != null) {
+            proizvod = proizvodService.findByOpis(description);
+
+        } else {
+            proizvod = proizvodService.findAll();
+        }
+        return ResponseEntity.ok(proizvod);
     }
 }
