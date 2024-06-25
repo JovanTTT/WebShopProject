@@ -94,4 +94,22 @@ public class ProizvodController {
         }
         return ResponseEntity.ok(proizvod);
     }
+
+    @GetMapping("/filterByPrice")
+    public ResponseEntity<List<ProizvodDTO>> filterProductsByPrice(@RequestParam(required = false) Double priceFrom,@RequestParam(required = false) Double priceTo) throws ProductNotFoundException {
+
+        List<ProizvodDTO> proizvod = new ArrayList<>();
+
+        if (priceFrom!= null && priceTo!=null ) {
+            proizvod = proizvodService.findByCena(priceFrom, priceTo);
+
+        }
+        else {
+            proizvod = proizvodService.findAll();
+            throw new ProductNotFoundException("Morate uneti od-do za cenu.");
+
+
+        }
+        return ResponseEntity.ok(proizvod);
+    }
 }
