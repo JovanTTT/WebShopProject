@@ -5,6 +5,7 @@ import com.example.webshop.DTO.SviProizvodiDTO;
 import com.example.webshop.error.PasswordMismatchException;
 import com.example.webshop.error.ProductNotFoundException;
 import com.example.webshop.model.Proizvod;
+import com.example.webshop.model.TipProdaje;
 import com.example.webshop.service.ProizvodService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;

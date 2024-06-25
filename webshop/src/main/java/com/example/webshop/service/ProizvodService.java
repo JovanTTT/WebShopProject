@@ -6,6 +6,7 @@ import com.example.webshop.error.ProductNotFoundException;
 import com.example.webshop.model.Kategorija;
 import com.example.webshop.model.Prodavac;
 import com.example.webshop.model.Proizvod;
+import com.example.webshop.model.TipProdaje;
 import com.example.webshop.repository.ProizvodRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
