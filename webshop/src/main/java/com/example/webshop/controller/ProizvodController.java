@@ -62,4 +62,20 @@ public class ProizvodController {
         }
         return ResponseEntity.ok(proizvod);
     }
+
+    @GetMapping("/filterByCategory")
+    public ResponseEntity<List<ProizvodDTO>> filterProductsByCategory(@RequestParam(required = false) String category) throws ProductNotFoundException {
+
+        List<ProizvodDTO> proizvod = new ArrayList<>();
+
+        if (category != null ) {
+            proizvod = proizvodService.findByKategorija(category);
+
+        }
+        else {
+            proizvod = proizvodService.findAll();
+
+        }
+        return ResponseEntity.ok(proizvod);
+    }
 }
