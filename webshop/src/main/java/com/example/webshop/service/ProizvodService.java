@@ -273,4 +273,36 @@ public class ProizvodService {
         return proizvodiDTO;
 
     }
+
+    public List<ProizvodDTO> findByKategorija(String category) throws ProductNotFoundException {
+
+        List<Proizvod> proizvodi = proizvodRepository.findByKategorijaNazivKategorije(category);
+        List<ProizvodDTO> proizvodiDTO = new ArrayList<>();
+
+        for(Proizvod proizvod: proizvodi){
+            ProizvodDTO proizvodDTO = new ProizvodDTO();//ako ovo ne odradim vraacace mi npr dve serpe umesto tiganj i serpu, moram
+            proizvodDTO.setId(proizvod.getId());
+            proizvodDTO.setNaziv(proizvod.getNaziv());
+            proizvodDTO.setOpis(proizvod.getOpis());
+            proizvodDTO.setSlikaProizvoda(proizvod.getSlikaProizvoda());
+            proizvodDTO.setCena(proizvod.getCena());
+            proizvodDTO.setTipProdaje(proizvod.getTipProdaje());
+            Set< Kategorija> kategorije=proizvod.getKategorija();
+            Set<KategorijaDTO> kategorijeDTO=new HashSet<>();
+            for(Kategorija kategorija: kategorije){
+                KategorijaDTO kategorijaDTO= new KategorijaDTO();
+                kategorijaDTO.setNazivKategorije(kategorija.getNazivKategorije());
+                kategorijaDTO.setId(kategorija.getId());
+                kategorijeDTO.add(kategorijaDTO);
+            }
+
+            proizvodDTO.setKategorije(kategorijeDTO);
+            proizvodiDTO.add(proizvodDTO);
+        }
+        if (proizvodiDTO.isEmpty()) {
+
+            throw new ProductNotFoundException("Trazeni proizvod ne postoji.");
+        }
+        return proizvodiDTO;
+    }
 }
