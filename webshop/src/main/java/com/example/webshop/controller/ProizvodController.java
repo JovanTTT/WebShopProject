@@ -1,11 +1,11 @@
 package com.example.webshop.controller;
 
 import com.example.webshop.DTO.ProizvodDTO;
+import com.example.webshop.DTO.ProizvodiZaProdajuDTO;
 import com.example.webshop.DTO.SviProizvodiDTO;
 import com.example.webshop.error.*;
-import com.example.webshop.model.Korisnik;
-import com.example.webshop.model.Proizvod;
-import com.example.webshop.model.TipProdaje;
+import com.example.webshop.model.*;
+import com.example.webshop.repository.KategorijaRepository;
 import com.example.webshop.service.ProizvodService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 @RequestMapping("/api/product")
@@ -23,6 +21,8 @@ public class ProizvodController {
 
     @Autowired
     private ProizvodService proizvodService;
+    @Autowired
+    private KategorijaRepository kategorijaRepository;
 
     @GetMapping("/products")
     public ResponseEntity<List<SviProizvodiDTO>> getAllProducts() {
@@ -147,5 +147,32 @@ public class ProizvodController {
 
         // return ResponseEntity.ok().build();
         return ResponseEntity.ok(proizvodDTO);
+    }
+
+    @PostMapping("/addForSale")
+    public ResponseEntity<String> SetProductForSell(@RequestBody ProizvodiZaProdajuDTO proizvodDTO, HttpSession session) throws UserNotFoundException, NoSellerException, CategoryExistsException {
+
+        Korisnik korisnik = (Korisnik) session.getAttribute("korisnik");
+        if (korisnik == null) {
+            throw new UserNotFoundException("Morate biti prijavljeni");
+        }
+        if (!korisnik.getUloga().equals(Uloga.PRODAVAC)) {
+            throw new NoSellerException("Samo prodavac može da postavi proizvod na prodaju.");
+        }
+
+        Set<Kategorija> kategorijeSet = new HashSet<>();
+        for (Kategorija kategorijaDTO : proizvodDTO.getKategorije()) {
+            Kategorija kategorija = kategorijaRepository.findByNazivKategorije(kategorijaDTO.getNazivKategorije());
+            if (kategorija == null) {
+                throw new CategoryExistsException("Kategorija koju želite da unesete ne postoji, morate je dodati.");
+            }
+            kategorijeSet.add(kategorija);
+        }
+
+        proizvodDTO.setKategorije(kategorijeSet); // Postavite set kategorija u DTO pre poziva servisa
+
+        proizvodService.dodajProizvod(proizvodDTO, korisnik);
+
+        return ResponseEntity.ok().body("Proizvod uspešno postavljen na prodaju.");
     }
 }
