@@ -1,13 +1,12 @@
 package com.example.webshop.service;
 
 import com.example.webshop.DTO.*;
+import com.example.webshop.error.CategoryExistsException;
 import com.example.webshop.error.PasswordMismatchException;
 import com.example.webshop.error.ProductNotFoundException;
 import com.example.webshop.error.UserNotFoundException;
-import com.example.webshop.model.Kategorija;
-import com.example.webshop.model.Prodavac;
-import com.example.webshop.model.Proizvod;
-import com.example.webshop.model.TipProdaje;
+import com.example.webshop.model.*;
+import com.example.webshop.repository.ProdavacRepository;
 import com.example.webshop.repository.ProizvodRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,6 +21,8 @@ public class ProizvodService {
 
     @Autowired
     private ProizvodRepository proizvodRepository;
+    @Autowired
+    private ProdavacRepository prodavacRepository;
 
 
     public ProizvodDTO findOne(Long id){
@@ -417,6 +418,30 @@ public class ProizvodService {
 
             throw new UserNotFoundException("Proizvod sa ID-jem " + id + " nije pronađen.");
         }
+    }
+
+    public void dodajProizvod(ProizvodiZaProdajuDTO proizvodDTO, Korisnik korisnik) throws CategoryExistsException {
+
+        Proizvod proizvod = new Proizvod();
+
+        proizvod.setKupac(null);
+        proizvod.setNaziv(proizvodDTO.getNaziv());
+        proizvod.setTipProdaje(proizvodDTO.getTipProdaje());
+        proizvod.setOpis(proizvodDTO.getOpis());
+        proizvod.setSlikaProizvoda(proizvodDTO.getSlikaProizvoda());
+        proizvod.setCena(proizvodDTO.getCena());
+        proizvod.setProdat(false);
+
+        Optional<Prodavac> prodavac = prodavacRepository.findById(korisnik.getId());
+        if (prodavac.isPresent()) {
+            proizvod.setProdavac(prodavac.get());
+        }
+
+        proizvod.setKategorija(new HashSet<>(proizvodDTO.getKategorije())); // Osigurajte da je set postavljen
+
+        proizvod.setDatumObjavljivanja(new Date());
+
+        proizvod = proizvodRepository.save(proizvod);
     }
 }
 
