@@ -2,8 +2,8 @@ package com.example.webshop.controller;
 
 import com.example.webshop.DTO.ProizvodDTO;
 import com.example.webshop.DTO.SviProizvodiDTO;
-import com.example.webshop.error.PasswordMismatchException;
-import com.example.webshop.error.ProductNotFoundException;
+import com.example.webshop.error.*;
+import com.example.webshop.model.Korisnik;
 import com.example.webshop.model.Proizvod;
 import com.example.webshop.model.TipProdaje;
 import com.example.webshop.service.ProizvodService;
@@ -11,13 +11,11 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/api/product")
@@ -114,5 +112,40 @@ public class ProizvodController {
         return ResponseEntity.ok(proizvod);
     }
 
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody Proizvod updatedProduct, HttpSession session) throws UserNotFoundException, ProductCanNotBeeChanged, NoSellerException, UserNotFoundException {
 
+        Korisnik korisnik= (Korisnik) session.getAttribute("korisnik");
+
+        if(korisnik==null){
+            System.out.println("uslo u if");
+            throw new UserNotFoundException("Morate biti prijavljeni.");
+
+        }
+
+        Optional<Proizvod> existingProduct = proizvodService.findById(id);
+
+        if(existingProduct.get().getProdat()){
+            throw new ProductCanNotBeeChanged("Proizvod je prodat.");
+
+        }
+        if (existingProduct.isEmpty()) {
+            throw new UserNotFoundException("Proizvod sa ID-jem " + id + " nije pronađen.");
+
+        }
+        if (existingProduct.get().getTipProdaje() == TipProdaje.AUKCIJA && !existingProduct.get().getPonude().isEmpty()) {
+
+            throw new ProductCanNotBeeChanged("Proizvod se ne može izmeniti jer postoje aktivne ponude u aukciji.");
+        }
+
+        if (!existingProduct.get().getProdavac().getKorisnickoIme().equals(korisnik.getKorisnickoIme())) {
+
+            //  return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            throw  new NoSellerException("Niste prodavac ovog proizvoda, ne možete ga izmeniti.");
+        }
+        SviProizvodiDTO proizvodDTO =proizvodService.updateProduct(existingProduct.get(), updatedProduct);
+
+        // return ResponseEntity.ok().build();
+        return ResponseEntity.ok(proizvodDTO);
+    }
 }
