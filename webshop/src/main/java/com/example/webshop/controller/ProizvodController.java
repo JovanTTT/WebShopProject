@@ -113,4 +113,6 @@ public class ProizvodController {
         }
         return ResponseEntity.ok(proizvod);
     }
+
+
 }

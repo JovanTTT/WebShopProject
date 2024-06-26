@@ -3,6 +3,7 @@ package com.example.webshop.service;
 import com.example.webshop.DTO.*;
 import com.example.webshop.error.PasswordMismatchException;
 import com.example.webshop.error.ProductNotFoundException;
+import com.example.webshop.error.UserNotFoundException;
 import com.example.webshop.model.Kategorija;
 import com.example.webshop.model.Prodavac;
 import com.example.webshop.model.Proizvod;
@@ -404,6 +405,18 @@ public class ProizvodService {
         updateProduct.setKategorije(kategorijeDTO);
 
         return updateProduct;
+    }
 
+    public Optional<Proizvod> findById(Long id) throws UserNotFoundException {
+
+        Optional<Proizvod> proizvod = proizvodRepository.findById(id);
+        if (proizvod.isPresent()) {
+
+            return proizvod;
+        } else {
+
+            throw new UserNotFoundException("Proizvod sa ID-jem " + id + " nije pronađen.");
+        }
     }
 }
+
