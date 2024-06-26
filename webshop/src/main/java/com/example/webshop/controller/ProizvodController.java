@@ -175,4 +175,11 @@ public class ProizvodController {
 
         return ResponseEntity.ok().body("Proizvod uspešno postavljen na prodaju.");
     }
+
+    @GetMapping("/pages")
+    public List<ProizvodDTO> getProizvodi(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "6") int size) {
+        return proizvodService.findAll(page, size);
+    }
 }
