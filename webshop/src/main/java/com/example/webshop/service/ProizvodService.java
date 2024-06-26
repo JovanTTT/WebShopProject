@@ -370,4 +370,40 @@ public class ProizvodService {
         }
         return proizvodiDTO;
     }
+
+    public SviProizvodiDTO updateProduct(Proizvod proizvod, Proizvod updatedProduct) {
+
+
+        proizvod.setCena(updatedProduct.getCena());
+        proizvod.setNaziv(updatedProduct.getNaziv());
+        proizvod.setDatumObjavljivanja(updatedProduct.getDatumObjavljivanja());
+        proizvod.setKategorija(updatedProduct.getKategorija());
+        proizvod.setPonude(updatedProduct.getPonude());
+        proizvod.setOpis(updatedProduct.getOpis());
+        proizvod.setSlikaProizvoda(updatedProduct.getSlikaProizvoda());
+        proizvod.setTipProdaje(updatedProduct.getTipProdaje());
+        proizvodRepository.save(proizvod);
+
+        SviProizvodiDTO updateProduct= new SviProizvodiDTO();
+        updateProduct.setNaziv(proizvod.getNaziv());
+        updateProduct.setOpis(proizvod.getOpis());
+        updateProduct.setId(proizvod.getId());
+        updateProduct.setSlikaProizvoda(proizvod.getSlikaProizvoda());
+        updateProduct.setTipProdaje(proizvod.getTipProdaje());
+        updateProduct.setCena(proizvod.getCena());
+        updateProduct.setTipProdaje(proizvod.getTipProdaje());
+        Set< Kategorija> kategorije=proizvod.getKategorija();
+        Set<KategorijaDTO> kategorijeDTO=new HashSet<>();
+        for(Kategorija kategorija: kategorije){
+            KategorijaDTO kategorijaDTO= new KategorijaDTO();
+            kategorijaDTO.setNazivKategorije(kategorija.getNazivKategorije());
+            kategorijaDTO.setId(kategorija.getId());
+            kategorijeDTO.add(kategorijaDTO);
+        }
+
+        updateProduct.setKategorije(kategorijeDTO);
+
+        return updateProduct;
+
+    }
 }
