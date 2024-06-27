@@ -1,6 +1,7 @@
 package com.example.webshop.controller;
 
 import com.example.webshop.DTO.ProizvodDTO;
+import com.example.webshop.DTO.ProizvodiNaProdajuDTO;
 import com.example.webshop.DTO.ProizvodiZaProdajuDTO;
 import com.example.webshop.DTO.SviProizvodiDTO;
 import com.example.webshop.error.*;
@@ -9,6 +10,7 @@ import com.example.webshop.repository.KategorijaRepository;
 import com.example.webshop.service.ProizvodService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -181,5 +183,24 @@ public class ProizvodController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int size) {
         return proizvodService.findAll(page, size);
+    }
+
+    @PutMapping("/endAuction/{proizvodId}")
+    public ResponseEntity<?> endAuction(@PathVariable Long proizvodId, HttpSession session) throws Exception, NoSellerException {
+        Korisnik korisnik = (Korisnik) session.getAttribute("korisnik");
+        if(korisnik == null){
+            throw new UserNotFoundException("Samo ulogovani korisnici mogu da menjaju podatke.");
+        }
+
+        if(!korisnik.getUloga().equals(Uloga.PRODAVAC)){
+            throw new NoSellerException("Samo prodavac može upravlja aukcijama.");
+        }
+
+        try {
+            ProizvodiNaProdajuDTO product = proizvodService.endAuction(proizvodId, korisnik.getId());
+            return new ResponseEntity<>(product, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 }
