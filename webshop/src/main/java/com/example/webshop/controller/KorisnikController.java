@@ -348,8 +348,32 @@ public class KorisnikController {
         }
         ProizvodiNaProdajuDTO kupljeniProizvodFiksna = proizvodService.kupiProizvodFiksnaCena(proizvod.get(), korisnik);
         return kupljeniProizvodFiksna;
+    }
 
+    @PostMapping("/shopNowAuction")
+    public ResponseEntity<PonudaDTO>  kupovinaProizvodaAukcija(@RequestParam(required = true) Long id,@RequestParam(required = true)
+    @Positive(message = "Nova ponuda mora biti veća od 0.") Double novaPonuda, HttpSession session) throws Exception, NoCustomerException {
 
+        Korisnik korisnik = (Korisnik) session.getAttribute("korisnik");
+        if (korisnik == null) {
+            throw new UserNotFoundException("Samo ulogovani korisnici mogu da kupuju proizvode!");
+
+        }if(korisnik.getUloga()==Uloga.PRODAVAC){
+            throw new UserNotFoundException("Samo kupci mogu da daju ponude.");
+        }
+        Optional<Proizvod> proizvod=proizvodService.findById(id);
+        Korisnik prodavac=proizvod.get().getProdavac();
+        if (!proizvod.get().getTipProdaje().equals(TipProdaje.AUKCIJA)) {
+            throw new ProductNotFoundException("Proizvod nije na aukciji.");
+
+        }
+        if (proizvod.get().getProdat()) {
+            throw new ProductNotFoundException("Proizvod je već prodat.");
+
+        }
+        PonudaDTO ponudaDTO = proizvodService.postavljanjeProizvodaNaAukciju(proizvod.get(), korisnik, novaPonuda, prodavac);
+
+        return new ResponseEntity<>(ponudaDTO, HttpStatus.OK);
     }
 }
 
