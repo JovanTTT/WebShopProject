@@ -4,6 +4,7 @@ import com.example.webshop.DTO.*;
 import com.example.webshop.error.*;
 import com.example.webshop.model.*;
 import com.example.webshop.repository.KupacRepository;
+import com.example.webshop.repository.PonudaRepository;
 import com.example.webshop.repository.ProdavacRepository;
 import com.example.webshop.repository.ProizvodRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,8 @@ public class ProizvodService {
     private ProdavacRepository prodavacRepository;
     @Autowired
     private KupacRepository kupacRepository;
+    @Autowired
+    private PonudaRepository ponudaRepository;
 
 
     public ProizvodDTO findOne(Long id){
@@ -471,6 +474,48 @@ public class ProizvodService {
         proizvodiNaProdajuDTO.setSlikaProizvoda(proizvod.getSlikaProizvoda());
 
         return proizvodiNaProdajuDTO;
+    }
+
+    public PonudaDTO postavljanjeProizvodaNaAukciju(Proizvod proizvod, Korisnik korisnik, Double novaPonuda, Korisnik prodavac) throws IOException {
+
+        List<Ponuda> postojecePonude = ponudaRepository.findByProizvodId(proizvod.getId());
+
+        boolean najvecaPonuda = true;
+
+
+        for (Ponuda ponuda : postojecePonude) {
+            if (novaPonuda <= ponuda.getCena()) {
+                throw new NotHighestOfferException("Ponuda koju ste poslali se nije uvažila jer je drugi korisnik poslao veću: " + ponuda.getCena() + ".");
+            }
+        }
+        Optional<Kupac> kupac = kupacRepository.findById(korisnik.getId());
+        Optional<Proizvod> pp2 = proizvodRepository.findById(proizvod.getId());
+
+
+        Ponuda ponuda = new Ponuda();
+        ponuda.setCena(novaPonuda);
+        ponuda.setKupacKojiDajePonudu(kupac.get());
+
+        ProizvodAukcijaDTO proizvodAukcijaDTO=new ProizvodAukcijaDTO();
+        proizvodAukcijaDTO.setNaziv(proizvod.getNaziv());
+        proizvodAukcijaDTO.setOpis(proizvod.getOpis());
+        proizvodAukcijaDTO.setSlikaProizvoda(proizvod.getSlikaProizvoda());
+        proizvodAukcijaDTO.setTipProdaje(proizvod.getTipProdaje());
+        ponuda.setProizvod(pp2.get());
+        ponudaRepository.save(ponuda);
+
+        PrijavaKorisnikDTO kupacDTO = new PrijavaKorisnikDTO();
+        kupacDTO.setMejl(kupac.get().getMejl());
+        kupacDTO.setIme(kupac.get().getIme());
+        kupacDTO.setPrezime(kupac.get().getPrezime());
+        kupacDTO.setKorisnickoIme(kupac.get().getKorisnickoIme());
+
+        PonudaDTO ponudaDTO = new PonudaDTO();
+        ponudaDTO.setCena(ponuda.getCena());
+        ponudaDTO.setProizvod(proizvodAukcijaDTO);
+        ponudaDTO.setKupacKojiDajePonudu(kupacDTO);
+        return ponudaDTO;
+
     }
 }
 
