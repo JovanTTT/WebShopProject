@@ -1,11 +1,9 @@
 package com.example.webshop.service;
 
 import com.example.webshop.DTO.*;
-import com.example.webshop.error.CategoryExistsException;
-import com.example.webshop.error.PasswordMismatchException;
-import com.example.webshop.error.ProductNotFoundException;
-import com.example.webshop.error.UserNotFoundException;
+import com.example.webshop.error.*;
 import com.example.webshop.model.*;
+import com.example.webshop.repository.KupacRepository;
 import com.example.webshop.repository.ProdavacRepository;
 import com.example.webshop.repository.ProizvodRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -23,6 +22,8 @@ public class ProizvodService {
     private ProizvodRepository proizvodRepository;
     @Autowired
     private ProdavacRepository prodavacRepository;
+    @Autowired
+    private KupacRepository kupacRepository;
 
 
     public ProizvodDTO findOne(Long id){
@@ -442,6 +443,34 @@ public class ProizvodService {
         proizvod.setDatumObjavljivanja(new Date());
 
         proizvod = proizvodRepository.save(proizvod);
+    }
+
+    public ProizvodiNaProdajuDTO kupiProizvodFiksnaCena(Proizvod proizvod, Korisnik korisnik) throws IOException {
+
+        if(proizvod.getProdat()){
+
+            throw  new ProductSoldException("Ovaj proizvod je već prodat.");
+        }
+
+        Optional<Kupac> kupac = kupacRepository.findById(korisnik.getId());
+        kupac.get().getKupljeniProizvodi().add(proizvod);
+
+        proizvod.setProdat(true);
+        proizvod.setKupac(kupac.get());
+
+        Optional<Prodavac> prodavac = prodavacRepository.findById(proizvod.getProdavac().getId());
+
+        prodavac.get().getProizvodiNaProdaju().remove(proizvod);
+
+        proizvod.setProdavac(prodavac.get());
+        proizvodRepository.save(proizvod);
+        ProizvodiNaProdajuDTO proizvodiNaProdajuDTO=new ProizvodiNaProdajuDTO();
+        proizvodiNaProdajuDTO.setOpis(proizvod.getOpis());
+        proizvodiNaProdajuDTO.setCena(proizvod.getCena());
+        proizvodiNaProdajuDTO.setNaziv(proizvod.getNaziv());
+        proizvodiNaProdajuDTO.setSlikaProizvoda(proizvod.getSlikaProizvoda());
+
+        return proizvodiNaProdajuDTO;
     }
 }
 
