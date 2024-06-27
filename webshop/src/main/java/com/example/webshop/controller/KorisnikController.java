@@ -2,10 +2,9 @@ package com.example.webshop.controller;
 
 import com.example.webshop.DTO.*;
 import com.example.webshop.error.*;
-import com.example.webshop.model.Korisnik;
-import com.example.webshop.model.Recenzija;
-import com.example.webshop.model.Uloga;
+import com.example.webshop.model.*;
 import com.example.webshop.service.KorisnikService;
+import com.example.webshop.service.ProizvodService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -25,6 +24,8 @@ public class KorisnikController {
 
     @Autowired
     private KorisnikService korisnikService;
+    @Autowired
+    private ProizvodService proizvodService;
 
       @PostMapping(value = "/registration", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Korisnik> registracijaKorisnika(@Valid @RequestBody RegistracijaKorisnikaDTO korisnik) throws UserAlreadyExistsException, EmailAlreadyExistsException, PasswordMismatchException {//valid proverava da li su ispunjeni zahtevi unutar registracija korstnika dTO
@@ -324,6 +325,31 @@ public class KorisnikController {
         }
 
         return ResponseEntity.ok(trenutniKorisnik);
+    }
+
+    @PostMapping("/shopNowFixedPrice/{id}")
+    public ProizvodiNaProdajuDTO kupovinaProizvodaFiksnaCena (@PathVariable Long id, HttpSession session) throws
+            IOException, NoCustomerException {
+        Korisnik korisnik = (Korisnik) session.getAttribute("korisnik");
+        if (korisnik == null) {
+            throw new UserNotFoundException("Samo ulogovani korisnici mogu da kupuju proizvode.");
+        }
+        if (!korisnik.getUloga().equals(Uloga.KUPAC)) {
+            throw new NoCustomerException("Samo kupac može da kupuje.");
+        }
+
+        Optional<Proizvod> proizvod = proizvodService.findById(id);
+        if (proizvod.isEmpty()) {
+            throw new ProductNotFoundException("Proizvod ne postoji.");
+        }
+        if (!proizvod.get().getTipProdaje().equals(TipProdaje.FIKSNA)) {
+            throw new ProductNotFoundException("Cena nije fiksna.");
+
+        }
+        ProizvodiNaProdajuDTO kupljeniProizvodFiksna = proizvodService.kupiProizvodFiksnaCena(proizvod.get(), korisnik);
+        return kupljeniProizvodFiksna;
+
+
     }
 }
 
