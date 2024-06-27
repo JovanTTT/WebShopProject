@@ -3,10 +3,7 @@ package com.example.webshop.service;
 import com.example.webshop.DTO.*;
 import com.example.webshop.error.*;
 import com.example.webshop.model.*;
-import com.example.webshop.repository.KupacRepository;
-import com.example.webshop.repository.PonudaRepository;
-import com.example.webshop.repository.ProdavacRepository;
-import com.example.webshop.repository.ProizvodRepository;
+import com.example.webshop.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ProizvodService {
@@ -27,6 +25,8 @@ public class ProizvodService {
     private KupacRepository kupacRepository;
     @Autowired
     private PonudaRepository ponudaRepository;
+    @Autowired
+    private KorisnikRepository korisnikRepository;
 
 
     public ProizvodDTO findOne(Long id){
@@ -515,7 +515,55 @@ public class ProizvodService {
         ponudaDTO.setProizvod(proizvodAukcijaDTO);
         ponudaDTO.setKupacKojiDajePonudu(kupacDTO);
         return ponudaDTO;
+    }
 
+    public ProizvodiNaProdajuDTO endAuction(Long proizvodId, Long prodavacId) throws Exception {
+        Proizvod proizvod = proizvodRepository.findById(proizvodId)
+                .orElseThrow(() -> new Exception("Proizvod ne postoji."));
+
+        Prodavac prodavac = prodavacRepository.findById(prodavacId)
+                .orElseThrow(() -> new Exception("Prodavac ne postoji."));
+
+        if (!prodavac.getProizvodiNaProdaju().contains(proizvod)) {
+            throw new Exception("Prodavac nema traženi proizvod na prodaju.");
+        }
+
+        if (proizvod.getTipProdaje() != TipProdaje.AUKCIJA) {
+            throw new Exception("Proizvod nije na aukciji.");
+        }
+
+        if (!proizvod.getProdat() && !proizvod.getPonude().isEmpty()) {
+            Ponuda highestPonuda = proizvod.getPonude()
+                    .stream()
+                    .max(Comparator.comparing(Ponuda::getCena))
+                    .orElseThrow(() -> new Exception("Ne postoje ponude."));
+
+            Kupac kupac = highestPonuda.getKupacKojiDajePonudu();
+            kupac.getKupljeniProizvodi().add(proizvod);
+
+            prodavac.getProizvodiNaProdaju().remove(proizvod);
+
+            proizvod.setProdat(true);
+            proizvod.setKupac(kupac);
+            // Dobavi sve korisnike koji su dali ponude
+            Set<Korisnik> korisniciSaPonudama = proizvod.getPonude().stream()
+                    .map(Ponuda::getKupacKojiDajePonudu)
+                    .collect(Collectors.toSet());
+
+            ProizvodiNaProdajuDTO p = new ProizvodiNaProdajuDTO();
+            p.setOpis(proizvod.getOpis());
+            p.setCena(proizvod.getCena());
+            p.setNaziv(proizvod.getNaziv());
+            p.setSlikaProizvoda(proizvod.getSlikaProizvoda());
+
+            korisnikRepository.save(kupac);
+            korisnikRepository.save(prodavac);
+            proizvodRepository.save(proizvod);
+
+            return p;
+        } else {
+            throw new Exception("Aukcija nije aktivna ili nema ponuda.");
+        }
     }
 }
 
