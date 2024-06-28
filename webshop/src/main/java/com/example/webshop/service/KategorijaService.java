@@ -17,4 +17,11 @@ public class KategorijaService {
         return kategorija!=null;
     }
 
+    public void dodajNovuKategoriju(String nazivKategorije) {
+
+        Kategorija novaKategorija = new Kategorija();
+        novaKategorija.setNazivKategorije(nazivKategorije);
+
+        kategorijaRepository.save(novaKategorija);
+    }
 }
