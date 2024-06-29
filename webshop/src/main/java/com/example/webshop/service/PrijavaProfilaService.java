@@ -4,6 +4,7 @@ import com.example.webshop.DTO.PrijavaKorisnikDTO;
 import com.example.webshop.DTO.PrijavaProfilaDTO;
 import com.example.webshop.DTO.PrijavaRequestDTO;
 import com.example.webshop.error.NoCustomerException;
+import com.example.webshop.error.NoSellerException;
 import com.example.webshop.error.UserNotFoundException;
 import com.example.webshop.model.Korisnik;
 import com.example.webshop.model.PrijavaProfila;
@@ -77,5 +78,53 @@ public class PrijavaProfilaService {
     public List<PrijavaProfila> pregledPrijava() {
 
         return prijavaProfilaRepository.findAllByStatusPrijave(Status.PODNETA);
+    }
+
+    public PrijavaProfilaDTO PodnesiPrijacuZaProdavca(Korisnik korisnik, PrijavaRequestDTO prijavaRequestDTO, Long id) throws UserNotFoundException, NoSellerException {
+
+        Optional<Korisnik> prijavljeniKorisnikOptional = korisnikRepository.findById(id);
+        Optional<Korisnik> podnosiocPrijave=korisnikRepository.findById(korisnik.getId());
+        if (prijavljeniKorisnikOptional.isEmpty()) {
+
+            throw new UserNotFoundException("Korisnik nije pronađen.");
+        }
+
+        Korisnik prijavljeniKorisnik = prijavljeniKorisnikOptional.get();
+
+        if (!prijavljeniKorisnik.getUloga().equals(Uloga.PRODAVAC)) {
+
+            throw new NoSellerException("Možete prijaviti samo prodavca od kog ste uzeli proizvod.");
+        }
+
+        PrijavaProfila prijavaProfila = new PrijavaProfila();
+        prijavaProfila.setRazlogPrijave(prijavaRequestDTO.getRazlogPrijave());
+        prijavaProfila.setDatumPodnosenjaPrijave(new Date());
+        prijavaProfila.setStatusPrijave(Status.PODNETA); // ili neki drugi podrazumevani status
+        prijavaProfila.setPodnosiocPrijave(podnosiocPrijave.get());
+        prijavaProfila.setPrijavljeniKorisnik(prijavljeniKorisnik);
+
+
+        prijavaProfila = prijavaProfilaRepository.save(prijavaProfila);
+        PrijavaKorisnikDTO prijavljenKorisnikDTO=new PrijavaKorisnikDTO();
+        PrijavaKorisnikDTO podnosiocPrijaveKorisnikDTO=new PrijavaKorisnikDTO();
+        prijavljenKorisnikDTO.setIme(prijavljeniKorisnik.getIme());
+        prijavljenKorisnikDTO.setPrezime(prijavljeniKorisnik.getPrezime());
+        prijavljenKorisnikDTO.setMejl(prijavljeniKorisnik.getMejl());
+        prijavljenKorisnikDTO.setKorisnickoIme(prijavljeniKorisnik.getKorisnickoIme());
+
+        podnosiocPrijaveKorisnikDTO.setKorisnickoIme(podnosiocPrijave.get().getKorisnickoIme());
+        podnosiocPrijaveKorisnikDTO.setIme(podnosiocPrijave.get().getIme());
+        podnosiocPrijaveKorisnikDTO.setPrezime(podnosiocPrijave.get().getPrezime());
+        podnosiocPrijaveKorisnikDTO.setMejl(podnosiocPrijave.get().getMejl());
+
+
+        PrijavaProfilaDTO prijavaProfilaDTO=new PrijavaProfilaDTO();
+        prijavaProfilaDTO.setDatumPodnosenjaPrijave(prijavaProfila.getDatumPodnosenjaPrijave());
+        prijavaProfilaDTO.setPrijavljeniKorisnik(prijavljenKorisnikDTO);
+        prijavaProfilaDTO.setPodnosiocPrijave(podnosiocPrijaveKorisnikDTO);
+        prijavaProfilaDTO.setStatusPrijave(prijavaProfila.getStatusPrijave());
+        prijavaProfilaDTO.setRazlogPrijave(prijavaProfila.getRazlogPrijave());
+
+        return prijavaProfilaDTO;
     }
 }
