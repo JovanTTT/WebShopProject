@@ -63,5 +63,39 @@ public class PrijavaController {
         }
     }
 
+    @PostMapping("/customerRequest/{id}")
+    public ResponseEntity<?> KupacPodnosiPrijavu(@PathVariable Long id, @RequestBody PrijavaRequestDTO prijavaRequestDTO, HttpSession session) throws UserNotFoundException, NoSellerException {
 
+        Korisnik korisnik = (Korisnik) session.getAttribute("korisnik");
+        if(korisnik == null){
+
+            throw new UserNotFoundException("Niste prijavljeni.");
+
+        }
+        if(!korisnik.getUloga().equals(Uloga.KUPAC)){
+
+            throw new NoSellerException("Korisnik koji nije kupac, ne može da prijavi prodavca.");
+
+        }
+        if(!korisnikService.jeKupacKupioOdProdavca(korisnik.getId(), id)) {
+            throw new UserNotFoundException("Kupac može da prijavi onog prodavca od kog je kupio proizvod");
+        }
+
+
+        Optional<Korisnik> korisnikOptional = korisnikService.findById(id);
+
+        if (korisnikOptional.isEmpty()) {
+            throw new UserNotFoundException("Korisnik nije pronađen.");
+        }
+        if (korisnikOptional.get().getUloga().equals(Uloga.PRODAVAC)) {
+
+            PrijavaProfilaDTO prijavljen = prijavaProfilaService.PodnesiPrijacuZaProdavca(korisnik,prijavaRequestDTO, id);
+
+            return ResponseEntity.ok(prijavljen);
+        }
+        else {
+            throw new UserNotFoundException("Možete prijaviti samo prodavce.");
+        }
+
+    }
 }
