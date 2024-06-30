@@ -1,5 +1,6 @@
 package com.example.webshop.controller;
 
+import com.example.webshop.DTO.IshodPrijaveDTO;
 import com.example.webshop.DTO.PrijavaProfilaDTO;
 import com.example.webshop.DTO.PrijavaRequestDTO;
 import com.example.webshop.error.*;

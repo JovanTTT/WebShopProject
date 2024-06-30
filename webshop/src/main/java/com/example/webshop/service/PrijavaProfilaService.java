@@ -151,4 +151,22 @@ public class PrijavaProfilaService {
         Korisnik korisnik = prijavaProfila.getPodnosiocPrijave();
 
     }
+
+    @Transactional
+    public void prihvatiPrijavu(Long prijavaId, String razlogPrihvatanja) throws IOException {
+
+        Optional<PrijavaProfila> prijava = prijavaProfilaRepository.findById(prijavaId);
+        if(prijava.isEmpty()){
+
+            throw new NoReportException("Tražena prijava ne postoji.");
+        }
+
+        prijava.get().setStatusPrijave(Status.PRIHVACENA);
+        prijava.get().setRazlogOdbijanja(razlogPrihvatanja);
+        prijavaProfilaRepository.save(prijava.get());
+        Korisnik korisnik=prijava.get().getPodnosiocPrijave();
+        Korisnik prijavljeniKorisnik=prijava.get().getPrijavljeniKorisnik();
+        prijavljeniKorisnik.setBlokiran(true);
+
+    }
 }
