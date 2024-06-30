@@ -123,4 +123,28 @@ public class PrijavaController {
         prijavaProfilaService.odbijPrijavu(prijavaId, razlogOdbijanjaDTO.getRazlog());
         return ResponseEntity.ok("Prijava je odbijena.");
     }
+
+    @PostMapping("/adminAcceptReport/{prijavaId}")
+    public ResponseEntity<String> prihvatiPrijavu(@PathVariable Long prijavaId, @RequestBody IshodPrijaveDTO razlogPrihvatanjaDTO, HttpSession session) throws IOException {
+
+        Korisnik korisnik = (Korisnik) session.getAttribute("korisnik");
+
+        if (korisnik == null) {
+            throw new UserNotFoundException("Morate se ulogovati.");
+        }
+
+        if (!korisnik.getUloga().equals(Uloga.ADMINISTRATOR)) {
+            throw new NoAdministratorException("Samo admin može prihavtiti prijave.");
+        }
+        Optional<PrijavaProfila> prijavaProfila=prijavaProfilaRepository.findById(prijavaId);
+        if(prijavaProfila.isEmpty()){
+            throw new NoReportException("Prijava ne postoji.");
+        }
+        if(prijavaProfila.get().getStatusPrijave()!=Status.PODNETA){
+            throw new NoReportException("Prijava je već obrađena.");
+        }
+
+        prijavaProfilaService.prihvatiPrijavu(prijavaId, razlogPrihvatanjaDTO.getRazlog());
+        return ResponseEntity.ok("Prijava je prihvaćena.");
+    }
 }
