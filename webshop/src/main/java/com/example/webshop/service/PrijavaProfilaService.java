@@ -4,6 +4,7 @@ import com.example.webshop.DTO.PrijavaKorisnikDTO;
 import com.example.webshop.DTO.PrijavaProfilaDTO;
 import com.example.webshop.DTO.PrijavaRequestDTO;
 import com.example.webshop.error.NoCustomerException;
+import com.example.webshop.error.NoReportException;
 import com.example.webshop.error.NoSellerException;
 import com.example.webshop.error.UserNotFoundException;
 import com.example.webshop.model.Korisnik;
@@ -16,6 +17,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -126,5 +128,27 @@ public class PrijavaProfilaService {
         prijavaProfilaDTO.setRazlogPrijave(prijavaProfila.getRazlogPrijave());
 
         return prijavaProfilaDTO;
+    }
+
+    @Transactional
+    public void odbijPrijavu(Long prijavaId, String razlogOdbijanja) throws IOException {
+
+        Optional<PrijavaProfila> prijava = prijavaProfilaRepository.findById(prijavaId);
+        if(prijava.isEmpty()){
+
+            throw new NoReportException("Tražena prijava ne postoji");
+        }
+        //  PrijavaProfila izmenjenaPrijava= new PrijavaProfila();
+//        prijava.get().setStatusPrijave(Status.ODBIJENA);
+//        prijava.get().setRazlogOdbijanja(razlogOdbijanja);
+//        prijavaProfilaRepository.save(prijava.get());
+//        Korisnik korisnik=prijava.get().getPodnosiocPrijave();
+//        sendReportRejected(korisnik, razlogOdbijanja);
+        PrijavaProfila prijavaProfila = prijava.get();
+        prijavaProfila.setStatusPrijave(Status.ODBIJENA);
+        prijavaProfila.setRazlogOdbijanja(razlogOdbijanja);
+        prijavaProfilaRepository.save(prijavaProfila);
+        Korisnik korisnik = prijavaProfila.getPodnosiocPrijave();
+
     }
 }
