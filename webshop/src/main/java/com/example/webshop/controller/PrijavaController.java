@@ -13,10 +13,12 @@ import com.example.webshop.service.KorisnikService;
 import com.example.webshop.service.PrijavaProfilaService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -146,5 +148,21 @@ public class PrijavaController {
 
         prijavaProfilaService.prihvatiPrijavu(prijavaId, razlogPrihvatanjaDTO.getRazlog());
         return ResponseEntity.ok("Prijava je prihvaćena.");
+    }
+
+    @GetMapping("/allReports")
+    public ResponseEntity<List<PrijavaProfilaDTO>> getAllReports (HttpSession session) throws UserNotFoundException, NoSellerException {
+        Korisnik korisnik = (Korisnik) session.getAttribute("korisnik");
+
+        if (korisnik == null) {
+            throw new UserNotFoundException("Samo ulogovani korisnici mogu da pregledaju recenzije!");
+        }
+
+        if (!korisnik.getUloga().equals(Uloga.ADMINISTRATOR)) {
+            throw new NoSellerException("Samo ADMINISTRATOR moze da pregleda recenzije!");
+        }
+
+        List<PrijavaProfilaDTO> prijave = prijavaProfilaService.vratiPrijaveAdministrator(korisnik.getId());
+        return new ResponseEntity<>(prijave, HttpStatus.OK);
     }
 }
