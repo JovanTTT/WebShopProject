@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -168,5 +169,41 @@ public class PrijavaProfilaService {
         Korisnik prijavljeniKorisnik=prijava.get().getPrijavljeniKorisnik();
         prijavljeniKorisnik.setBlokiran(true);
 
+    }
+
+    public List<PrijavaProfilaDTO> vratiPrijaveAdministrator(Long administratorId){
+        Korisnik admin = korisnikRepository.findById(administratorId).get();
+        List<PrijavaProfila> svePrijave = prijavaProfilaRepository.findAll();
+
+        List<PrijavaProfilaDTO> prijave = new ArrayList<>();
+        for(PrijavaProfila prijava : svePrijave){
+            PrijavaProfilaDTO dto = new PrijavaProfilaDTO();
+
+            dto.setRazlogPrijave(prijava.getRazlogPrijave());
+            dto.setStatusPrijave(prijava.getStatusPrijave());
+            dto.setDatumPodnosenjaPrijave(prijava.getDatumPodnosenjaPrijave());
+            dto.setId(prijava.getId());
+
+            Korisnik podnosilac = prijava.getPodnosiocPrijave();
+            Korisnik prijavljen = prijava.getPrijavljeniKorisnik();
+
+            PrijavaKorisnikDTO podnosilacDto = new PrijavaKorisnikDTO();
+            podnosilacDto.setIme(podnosilac.getIme());
+            podnosilacDto.setPrezime(podnosilac.getPrezime());
+            podnosilacDto.setMejl(podnosilac.getMejl());
+            podnosilacDto.setKorisnickoIme(podnosilac.getKorisnickoIme());
+
+            PrijavaKorisnikDTO prijavljenDto = new PrijavaKorisnikDTO();
+            prijavljenDto.setIme(prijavljen.getIme());
+            prijavljenDto.setPrezime(prijavljen.getPrezime());
+            prijavljenDto.setMejl(prijavljen.getMejl());
+            prijavljenDto.setKorisnickoIme(prijavljen.getKorisnickoIme());
+
+            dto.setPodnosiocPrijave(podnosilacDto);
+            dto.setPrijavljeniKorisnik(prijavljenDto);
+
+            prijave.add(dto);
+        }
+        return prijave;
     }
 }
