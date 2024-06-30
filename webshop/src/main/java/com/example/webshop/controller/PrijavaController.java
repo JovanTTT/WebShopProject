@@ -2,10 +2,10 @@ package com.example.webshop.controller;
 
 import com.example.webshop.DTO.PrijavaProfilaDTO;
 import com.example.webshop.DTO.PrijavaRequestDTO;
-import com.example.webshop.error.NoCustomerException;
-import com.example.webshop.error.NoSellerException;
-import com.example.webshop.error.UserNotFoundException;
+import com.example.webshop.error.*;
 import com.example.webshop.model.Korisnik;
+import com.example.webshop.model.PrijavaProfila;
+import com.example.webshop.model.Status;
 import com.example.webshop.model.Uloga;
 import com.example.webshop.repository.PrijavaProfilaRepository;
 import com.example.webshop.service.KorisnikService;
@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Optional;
 
 @RestController
@@ -96,6 +97,29 @@ public class PrijavaController {
         else {
             throw new UserNotFoundException("Možete prijaviti samo prodavce.");
         }
+    }
 
+    @PostMapping("/adminRejectionReport/{prijavaId}")
+    public ResponseEntity<String> odbijPrijavu(@PathVariable Long prijavaId, @RequestBody IshodPrijaveDTO razlogOdbijanjaDTO, HttpSession session) throws IOException {
+
+        Korisnik korisnik = (Korisnik) session.getAttribute("korisnik");
+
+        if (korisnik == null) {
+            throw new UserNotFoundException("Morate se ulogovati.");
+        }
+
+        if (!korisnik.getUloga().equals(Uloga.ADMINISTRATOR)) {
+            throw new NoAdministratorException("Samo admin može odbiti prijave.");
+        }
+        Optional<PrijavaProfila> prijavaProfila=prijavaProfilaRepository.findById(prijavaId);
+        if(prijavaProfila.isEmpty()){
+            throw new NoReportException("Prijava ne postoji.");
+        }
+        if(prijavaProfila.get().getStatusPrijave()!= Status.PODNETA){
+            throw new NoReportException("Prijava je već obrađena.");
+        }
+
+        prijavaProfilaService.odbijPrijavu(prijavaId, razlogOdbijanjaDTO.getRazlog());
+        return ResponseEntity.ok("Prijava je odbijena.");
     }
 }
