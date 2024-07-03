@@ -49,5 +49,53 @@ export default {
 </script>
 
 <style>
+.login-form {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  margin: 50px auto;
+  padding: 20px;
+  border: 1px solid #ffffff;
+  border-radius: 5px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 5px rgba(47, 128, 102, 0.76);
+  align-items: center;
+  margin-top: 100px;
+}
 
+.login-form label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.login-form input[type="text"],
+.login-form input[type="password"] {
+  width: 90%;
+  padding: 10px;
+  border: 1px solid #f8cdf8;
+  border-radius: 3px;
+  margin-bottom: 10px;
+  background-color: rgba(224, 184, 224, 0.93);
+}
+
+.login-form input[type="text"]:focus,
+.login-form input[type="password"]:focus {
+  outline: none;
+  border: 1px solid rgba(47, 128, 102, 0.76);
+}
+
+.login-form button {
+  background-color: rgba(47, 128, 102, 0.76);
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.login-form button:hover {
+  background-color: rgb(72, 136, 113);
+}
 </style>
