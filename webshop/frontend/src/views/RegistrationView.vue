@@ -50,8 +50,51 @@
   </div>
 </template>
 
-<script setup>
+<script>
+import axios from "axios";
+import HelloWorld from "@/components/HelloWorld.vue";
+export default {
+  name: "RegistrationView",
+  components: {HelloWorld},
+  data: function () {
+    return {
+      korisnik: {},//ovo dobijam prilikom prijave, posto to posle prosledjujem pomocu url mora da bude isto kao polja u
+      //login dto klasi
+      showErrorModal: false,
+      successMessage: ''
+    };
+  },
+  methods: {
+    registration: function () {
+      axios
+          .post("http://localhost:8080/api/user/registration", this.korisnik, {
+            withCredentials: true,//zbog sesije
+          })
+          .then((res) => {
+            console.log(res);//javlja da je dobro i stavlja me na home stranicu
+            this.$router.push("/");
+          })
+          .catch((error) => {
+            if (error.response && error.response.data === "Korisnik sa ovim email-om već postoji.") {
+              this.successMessage= "Korisnik sa ovim email-om već postoji.";
+              this.showErrorModal = true;
+            }else if(error.response && error.response.data === "Korisnik sa ovim korisnickim imenom vec postoji."){
+              this.successMessage= "Korisnik sa ovim korisnickim imenom vec postoji.";
+              this.showErrorModal = true;
+            }else if(error.response && error.response.data ===  "Lozinke se ne poklapaju."){
+              this.successMessage= "Lozinke se ne poklapaju.";
+              this.showErrorModal = true;
+            }else{
+              console.log(error);
+            }
+          });
 
+    },
+    closeErrorModal() {
+      this.showErrorModal = false; // Zatvaranje grešnog modalnog prozora
+    },
+  },
+};
 </script>
 
 <style scoped>
