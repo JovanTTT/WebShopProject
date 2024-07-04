@@ -2,8 +2,8 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LoginView from "@/views/LoginView.vue";
+import RegistrationView from "@/views/RegistrationView.vue";
 // import ProductView from "@/views/ProductView.vue";
-// import RegistrationView from "@/views/RegistrationView.vue";
 // import HomePageView from "@/views/HomePageView.vue";
 // import ProfileView from "@/views/ProfileView.vue";
 // import SellerProfileView from "@/views/SellerProfileView.vue";
@@ -27,12 +27,11 @@ const routes = [
     name: 'login',
     component: LoginView
   },
-  // {
-  //   path: '/registration',
-  //   name: 'registration',
-  //   component: RegistrationView
-  //   //neibtno
-  // },
+  {
+    path: '/registration',
+    name: 'registration',
+    component: RegistrationView
+  },
   // {
   //   path: '/homepage',
   //   name: 'homepage',
