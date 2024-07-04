@@ -1,5 +1,6 @@
 package com.example.webshop.DTO;
 
+import com.example.webshop.model.Uloga;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,5 +16,6 @@ public class PrijavaKorisnikaDTO {
 
     private String lozinka;
 
+    private Uloga uloga;
 
 }

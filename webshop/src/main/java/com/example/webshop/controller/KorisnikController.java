@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -35,17 +36,23 @@ public class KorisnikController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> prijava(@RequestBody PrijavaKorisnikaDTO prijavaDto, HttpSession session){
+    public ResponseEntity<Object> prijava(@RequestBody PrijavaKorisnikaDTO prijavaDto, HttpSession session){
 
         if(prijavaDto.getKorisnickoIme().isEmpty() || prijavaDto.getLozinka().isEmpty())
-            return new ResponseEntity("Neispravni podaci, molim Vas pokušajte ponovo.", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Neispravni podaci, molim Vas pokušajte ponovo.", HttpStatus.BAD_REQUEST);
 
         Korisnik loginovaniKorisnik = korisnikService.prijava(prijavaDto.getKorisnickoIme(), prijavaDto.getLozinka());
         if (loginovaniKorisnik == null)
             return new ResponseEntity<>("Korisnik ne postoji.", HttpStatus.NOT_FOUND);
 
         session.setAttribute("korisnik", loginovaniKorisnik);
-        return ResponseEntity.ok("Prijava uspešna.");
+        // Dodajte ID korisnika u odgovor
+        return ResponseEntity.ok().body(Map.of(
+                "message", "Prijava uspešna.",
+                "korisnik", loginovaniKorisnik,
+                "id", loginovaniKorisnik.getId(),
+                "uloga", loginovaniKorisnik.getUloga()
+        ));
     }
 
     @PostMapping("/logout")
