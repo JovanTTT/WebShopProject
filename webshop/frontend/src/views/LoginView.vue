@@ -76,7 +76,7 @@ export default {
   border: 1px solid #f8cdf8;
   border-radius: 3px;
   margin-bottom: 10px;
-  background-color: rgba(224, 184, 224, 0.93);
+  //background-color: rgba(224, 184, 224, 0.93);
 }
 
 .login-form input[type="text"]:focus,
