@@ -97,6 +97,96 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
+.registration-form {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start; /* Polja počinju od vrha */
+  flex-wrap: wrap; /* Omogućava da se redovi prelome ako nema dovoljno širine */
+  width: 100%;
+  max-width: 800px; /* Ograničava širinu formulara */
+  margin: 50px auto;
+  padding: 20px;
+  border: 1px solid rgba(47, 128, 102, 0.76);
+  border-radius: 5px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 5px rgba(47, 128, 102, 0.76);
+  margin-top: 100px;
 
+}
+
+.column {
+  flex: 1; /* Ravnomerno raspoređuje prostor između kolona */
+  margin-right: 20px; /* Razmak između kolona */
+}
+
+.column:last-child {
+  margin-right: 0; /* Poslednja kolona nema desni razmak */
+}
+
+.registration-form label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.registration-form input[type="text"],
+.registration-form input[type="password"],
+.registration-form input[type="date"],
+.registration-form select {
+  width: 100%; /* Popunjava celu širinu kolone */
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #e0b8e0;
+  border-radius: 3px;
+  box-sizing: border-box;
+  //background-color: #d8d8f6;
+}
+
+.registration-form button {
+  width: 100%; /* Popunjava celu širinu formulara */
+  padding: 12px 20px;
+  margin-top: 20px; /* Razmak između polja i dugmeta */
+  background-color: rgba(47, 128, 102, 0.76);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.registration-form button:hover {
+  background-color: rgb(72, 136, 113);
+}.modal {
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   background-color: rgba(0, 0, 0, 0.5);
+   display: flex;
+   align-items: center;
+   justify-content: center;
+ }
+
+.modal-content {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 5px;
+  width: 90%;
+  max-width: 500px;
+  text-align: center;
+}
+.modal-content .close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 1.5em;
+  color: #aaa;
+}
+
+.modal-content .close:hover {
+  color: #000;
+}
 </style>
