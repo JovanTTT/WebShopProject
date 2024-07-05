@@ -103,6 +103,47 @@
         </div>
       </div>
     </div>
+    <div v-if="showEditModal" class="modal" @click.self="closeEditModal">
+      <div class="modal-content">
+        <span class="close" @click="closeEditModal">&times;</span>
+        <div v-if="selectedProduct">
+          <h3>Ažuriraj proizvod:</h3>
+          <form @submit.prevent="updateProduct">
+            <div>
+              <label for="naziv">Naziv:</label>
+              <input type="text" v-model="selectedProduct.naziv" id="naziv" required>
+            </div>
+            <div>
+              <label for="cena">Cena:</label>
+              <input type="number" v-model="selectedProduct.cena" id="cena" required>
+            </div>
+            <div>
+              <label for="opis">Opis:</label>
+              <textarea v-model="selectedProduct.opis" id="opis" required></textarea>
+            </div>
+            <div>
+              <label for="slikaProizvoda">Slika proizvoda (URL):</label>
+              <input type="text" v-model="selectedProduct.slikaProizvoda" id="slikaProizvoda" required>
+            </div>
+            <div>
+              <label for="tipProdaje">Tip prodaje:</label>
+              <select v-model="selectedProduct.tipProdaje" id="tipProdaje" required>
+                <option value="PRODAJA">Prodaja</option>
+                <option value="AUKCIJA">Aukcija</option>
+              </select>
+            </div>
+            <button type="submit">Sačuvaj izmene</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div v-if="showSuccessModal" class="modal">
+      <div class="modal-content">
+        <span class="close" @click="closeSuccessModal">&times;</span>
+        <p>{{ successMessage }}</p>
+        <button @click="closeSuccessModal" class="button-accept">Zatvori</button>
+      </div>
+    </div>
   </div>
 </template>
 
