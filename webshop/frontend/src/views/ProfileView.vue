@@ -59,7 +59,16 @@
         </div>
       </div>
     </div>
-
+    <div v-if="currentUser.uloga === 'KUPAC'" class="product-section">
+      <h2>Kupljeni proizvodi</h2>
+      <ul>
+        <li v-for="proizvod in kupljeniProizvodi" :key="proizvod.id"  @click="prikaziDetaljeProizvoda(proizvod.id)" class="ime-proizvoda">
+          <div>
+            <p>Naziv: {{ proizvod.naziv }}</p>
+          </div>
+        </li>
+      </ul>
+    </div>
 
   </div>
 </template>
