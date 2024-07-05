@@ -79,6 +79,30 @@
         </li>
       </ul>
     </div>
+    <div v-if="showModal" class="modal" @click.self="closeModal">
+      <div class="modal-content">
+        <span class="close" @click="closeModal">&times;</span>
+        <div v-if="selectedProduct">
+          <h3>Detalji proizvoda:</h3>
+          <img :src="selectedProduct.slikaProizvoda" alt="Slika proizvoda" class="product-image">
+          <p>Naziv: {{ selectedProduct.naziv }}</p>
+          <p>Cena: {{ selectedProduct.cena }}</p>
+          <p>Opis: {{ selectedProduct.opis }}</p>
+          <p>Tip prodaje: {{ selectedProduct.tipProdaje }}</p>
+          <div v-if="currentUser.uloga==='KUPAC' && selectedProduct.prodavac">
+            <p @click="goToSellerProfile(selectedProduct.prodavac.id)"  class="product-name-user-name">Prodavac: {{ selectedProduct.prodavac.korisnickoIme }}</p>
+          </div>
+          <div v-if="currentUser.uloga==='PRODAVAC' && selectedProduct.kupac">
+            <p @click="goToCustomerProfile(selectedProduct.kupac.id)"  class="product-name-user-name">Kupac: {{ selectedProduct.kupac.korisnickoIme }}</p>
+          </div>
+          <button v-if="currentUser.uloga === 'PRODAVAC' && selectedProduct.kupac===null" @click="editProduct" class="button-accept">Ažuriraj proizvod</button>
+          <button v-if="currentUser.uloga === 'PRODAVAC' && selectedProduct.tipProdaje === 'AUKCIJA'"
+                  @click="endAuction(selectedProduct.id)" class="button-accept" >
+            Završi aukciju
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
