@@ -69,7 +69,16 @@
         </li>
       </ul>
     </div>
-
+    <div v-else-if="currentUser.uloga === 'PRODAVAC'" class="product-section">
+      <h2>Proizvodi na prodaju</h2>
+      <ul>
+        <li v-for="proizvod in proizvodiNaProdaju" :key="proizvod.id" @click="prikaziDetaljeProizvoda(proizvod.id)" class="ime-proizvoda">
+          <div>
+            <p class="product-name-user-name">Naziv: {{ proizvod.naziv }}</p>
+          </div>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
