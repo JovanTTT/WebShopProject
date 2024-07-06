@@ -327,12 +327,11 @@ public class KorisnikController {
         Korisnik korisnik = (Korisnik) session.getAttribute("korisnik");
 
         Optional<Korisnik> trenutniKorisnik = korisnikService.findById(korisnik.getId());
-
-        if (trenutniKorisnik == null) {
+        if (trenutniKorisnik.get() == null) {
             throw new UserNotFoundException("Samo ulogovani korisnici mogu da pristupe ovoj funkciji.");
         }
 
-        return ResponseEntity.ok(trenutniKorisnik);
+        return ResponseEntity.ok(trenutniKorisnik.get());
     }
 
     @PostMapping("/shopNowFixedPrice/{id}")

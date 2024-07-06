@@ -69,6 +69,7 @@
         </li>
       </ul>
     </div>
+
     <div v-else-if="currentUser.uloga === 'PRODAVAC'" class="product-section">
       <h2>Proizvodi na prodaju</h2>
       <ul>
@@ -79,6 +80,7 @@
         </li>
       </ul>
     </div>
+
     <div v-if="showModal" class="modal" @click.self="closeModal">
       <div class="modal-content">
         <span class="close" @click="closeModal">&times;</span>
@@ -144,6 +146,7 @@
         <button @click="closeSuccessModal" class="button-accept">Zatvori</button>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -368,11 +371,10 @@ export default {
             }else if(error.response && error.response.data === "Ne postoje ponude."){
               this.successMessage = "Ne postoje ponude.";
               this.showSuccessModal = true;
-            }else if(error.response && error.response.data === "Aukcija nije aktivna ili nema ponuda."){
+            }else if (error.response && error.response.data === "Aukcija nije aktivna ili nema ponuda.") {
               this.successMessage = "Aukcija nije aktivna ili nema ponuda.";
               this.showSuccessModal = true;
-            }
-            else {
+            } else {
               console.error('Greška pri završavanju aukcije:', error);
               this.successMessage = "Greška pri završavanju aukcije:";
               this.showSuccessModal = true;
@@ -384,7 +386,7 @@ export default {
       if (user) {
         this.$router.push(`/sellerProfile/${prodavacId}`);
       } else {
-        this.successMessage="Morate biti prijavljeni da bi ste mogli da vidite profil prodavca."
+        this.successMessage = "Morate biti prijavljeni da bi ste mogli da vidite profil prodavca."
         this.showLoginModal = true;
       }
     },
@@ -393,7 +395,7 @@ export default {
       if (user) {
         this.$router.push(`/customerProfile/${kupacId}`);
       } else {
-        this.successMessage="Morate biti prijavljeni da bi ste mogli da vidite profil kupca."
+        this.successMessage = "Morate biti prijavljeni da bi ste mogli da vidite profil kupca."
         this.showLoginModal = true;
       }
     },
@@ -402,6 +404,7 @@ export default {
 </script>
 
 <style scoped>
+
 .user-profile {
   max-width: 1200px;
   margin: 50px auto;
@@ -502,6 +505,7 @@ export default {
 .updateDugme {
   margin-left: 20px;
 }
+
 .product-section {
   margin-top: 20px;
   background-color: #f9f9f9;
@@ -539,6 +543,7 @@ export default {
   background-color: #f0f0f0;
   cursor: pointer;
 }
+
 .modal {
   display: flex;
   align-items: center;
@@ -578,11 +583,13 @@ export default {
   text-decoration: none;
   cursor: pointer;
 }
+
 .product-image {
   max-width: 50%;
   height: auto;
   margin-bottom: 20px;
 }
+
 .close:hover,
 .close:focus {
   color: black;
@@ -661,6 +668,7 @@ export default {
 .button-accept:focus {
   outline: none; /* Uklanja outline prilikom fokusa */
 }
+
 .product-name-user-name:hover {
   cursor: pointer;
 }
@@ -668,4 +676,5 @@ export default {
 .ime-proizvoda {
   cursor: pointer;
 }
+
 </style>

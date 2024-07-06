@@ -58,7 +58,7 @@ public class Korisnik implements Serializable {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @JsonIgnore
+    //@JsonIgnore
     private Uloga uloga;
 
     @Column
