@@ -544,5 +544,45 @@ public class KorisnikService {
 
         return recenzijaRepository.save(existingReview);
     }
+
+    public Set<?> getProizvodiKorisnika(Long id) throws UserNotFoundException {
+        Optional<Korisnik> korisnikOptional = korisnikRepository.findById(id);
+        if (korisnikOptional.isPresent()) {
+            Korisnik korisnik = korisnikOptional.get();
+            if (korisnik instanceof Kupac) {
+                Kupac kupac = (Kupac) korisnik;
+                Set<ProizvodiNaProdajuDTO> proizvodiNaProdajuDTO=new HashSet<>();
+
+                for(Proizvod p: kupac.getKupljeniProizvodi()){
+                    ProizvodiNaProdajuDTO proizvodNaProdajuDTO=new ProizvodiNaProdajuDTO();
+                    proizvodNaProdajuDTO.setCena(p.getCena());
+                    proizvodNaProdajuDTO.setNaziv(p.getNaziv());
+                    proizvodNaProdajuDTO.setId(p.getId());
+                    proizvodNaProdajuDTO.setSlikaProizvoda(p.getSlikaProizvoda());
+                    proizvodNaProdajuDTO.setOpis(p.getOpis());
+                    proizvodiNaProdajuDTO.add(proizvodNaProdajuDTO);
+                }
+                return proizvodiNaProdajuDTO;
+            } else if (korisnik instanceof Prodavac) {
+                Prodavac prodavac = (Prodavac) korisnik;
+                Set<ProizvodiNaProdajuDTO> proizvodiNaProdajuDTO=new HashSet<>();
+
+                for(Proizvod p: prodavac.getProizvodiNaProdaju()){
+                    ProizvodiNaProdajuDTO proizvodNaProdajuDTO=new ProizvodiNaProdajuDTO();
+                    proizvodNaProdajuDTO.setCena(p.getCena());
+                    proizvodNaProdajuDTO.setNaziv(p.getNaziv());
+                    proizvodNaProdajuDTO.setSlikaProizvoda(p.getSlikaProizvoda());
+                    proizvodNaProdajuDTO.setOpis(p.getOpis());
+                    proizvodNaProdajuDTO.setId(p.getId());
+                    proizvodiNaProdajuDTO.add(proizvodNaProdajuDTO);
+                }
+                return proizvodiNaProdajuDTO;
+            } else {
+                throw new IllegalArgumentException("Korisnik sa ID-jem  nije ni kupac ni prodavac.");
+            }
+        } else {
+            throw new UserNotFoundException("Korisnik sa ID-jem  nije pronađen.");
+        }
+    }
 }
 

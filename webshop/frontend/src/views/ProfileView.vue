@@ -147,10 +147,525 @@
   </div>
 </template>
 
-<script setup>
+<script>
+import axios from 'axios';
 
+export default {
+  data() {
+    return {
+      currentUser: {
+        ime: '',
+        prezime: '',
+        korisnickoIme: '',
+        mejl: '',
+        telefon: '',
+        staraLozinka: '',
+        novaLozinka: '',
+        datumRodjenja: '',
+        uloga: '',
+        slika: '',
+        opisKorisnika: ''
+      }, // Objekat za čuvanje podataka o korisniku
+      loading: true, // Prikazivanje loadera dok se podaci učitavaju
+      showReviews: false,
+      reviews: [],
+      proizvodiNaProdaju: [],
+      kupljeniProizvodi:[],
+      user: null,
+      userRole: '',
+      selectedProduct: null,
+      showModal: false,
+      showEditModal: false,
+      userUSER:null,
+      showSuccessModal: false,
+    };
+  },
+  mounted() {
+    // Pozivamo metodu za dobavljanje trenutnog korisnika kada se komponenta montira
+    this.fetchCurrentUser();
+    this.fetchProducts();
+    //this.fetchReviews();
+
+  },
+  methods: {
+    fetchCurrentUser() {
+      axios
+          .get('http://localhost:8080/api/user/currentUser', {withCredentials: true})
+          .then(response => {
+            this.currentUser = response.data;
+            console.log("JOVANOVA METODA",this.currentUser);
+            this.loading = false;
+          })
+          .catch(error => {
+            console.error('Greška pri dobavljanju podataka korisnika:', error);
+            this.loading = false;
+          });
+    },
+    update(){
+      if(this.currentUser.staraLozinka == null && this.currentUser.novaLozinka == null){
+        alert('Morate uneti trenutnu lozinku');
+      } else if(this.currentUser.staraLozinka == null){
+        alert('Morate uneti trenutnu lozinku');
+      }else if(this.currentUser.uloga == null){
+        alert('Morate izabrati ulogu');
+      }else if(this.currentUser.novaLozinka == null){
+        alert('Ponovo unesite staru lozinku ili unesite novu!');
+      }
+      console.log('Trenutni podaci o korisniku pre slanja:', this.currentUser);
+      axios
+          .put(`http://localhost:8080/api/user/updateSeller/${this.currentUser.id}`, this.currentUser, {
+            withCredentials: true,
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          })
+          .then(response => {
+            this.currentUser = response.data;
+            this.loading = false;
+          })
+          .catch(error => {
+            console.error('Greška pri dobavljanju podataka korisnika:', error);
+            this.loading = false;
+          });
+    },
+
+    recenzije(){
+      this.showReviews = !this.showReviews;
+      console.log('Toggle Reviews:', this.showReviews);
+      if (this.showReviews && this.reviews.length === 0) {
+        this.fetchReviews();
+      }
+    },
+    formatDate(dateString) {
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return new Date(dateString).toLocaleDateString(undefined, options);
+    },
+    fetchReviews(){
+      let endpoint;
+      console.log(this.currentUser.uloga);
+      if(this.currentUser.uloga === 'KUPAC'){
+        endpoint = 'http://localhost:8080/api/user/reviewedSellers/received';
+      } else if(this.currentUser.uloga === 'PRODAVAC'){
+        endpoint = 'http://localhost:8080/api/user/reviewedBuyer/received';
+      }else{
+        console.error('Nepoznata uloga korisnika', this.currentUser);
+        return;
+      }
+
+      axios
+          .get(endpoint, {
+            withCredentials: true,
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          })
+          .then(response => {
+            console.log('Fetched Reviews:', response.data);
+            this.reviews = response.data;
+          })
+          .catch(error => {
+            console.error('Greška pri dobavljanju podataka o recenzijama:', error);
+          });
+    },
+    fetchProducts() {
+      console.log("NJANJA");
+      const user = JSON.parse(localStorage.getItem('user'));
+      console.log(user);
+      const userRole = localStorage.getItem("userRole");
+      console.log("ULOGA",userRole);
+      let endpoint;
+      if (userRole === 'KUPAC') {
+        endpoint = `http://localhost:8080/api/user/products/${user}`;
+      } else if (userRole === 'PRODAVAC') {
+        endpoint = `http://localhost:8080/api/user/products/${user}`;
+      } else {
+        console.error('Nepoznata uloga korisnika:',userRole   );
+        return;
+      }
+
+      axios.get(endpoint, { withCredentials: true })
+          .then(response => {
+            console.log(response);
+            if (userRole   === 'KUPAC') {
+              this.kupljeniProizvodi = response.data;
+            } else if (userRole === 'PRODAVAC') {
+              this.proizvodiNaProdaju = response.data; // Update proizvodiNaProdaju
+            }
+          })
+          .catch(error => {
+            console.error('Greška pri dobavljanju podataka o proizvodima:', error);
+          });
+    },
+    prikaziDetaljeProizvoda(id) {
+      console.log("OVO JE PROIZVOD",id);
+      axios.get(`http://localhost:8080/api/product/${id}`, { withCredentials: true })
+          .then(response => {
+            console.log('Detalji proizvoda:', response.data);
+            this.showModal = true;
+            this.selectedProduct = response.data;
+          })
+          .catch(error => {
+            console.error('Greška pri dobavljanju detalja proizvoda:', error);
+          });
+    },
+    closeModal() {
+      this.showModal = false;
+      this.selectedProduct = null;
+    },
+    editProduct() {
+      this.showEditModal = true;
+      this.showModal = false;
+    },
+    closeEditModal() {
+      this.showEditModal = false;
+    },
+    closeSuccessModal() {
+      this.showSuccessModal = false;
+    },
+    updateProduct() {
+      const id = this.selectedProduct.id;
+
+      axios
+          .put(`http://localhost:8080/api/product/update/${id}`, this.selectedProduct, {
+            withCredentials: true,
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          })
+          .then(response => {
+            this.successMessage = "Proizvod je uspešno ažuriran.";
+            this.showSuccessModal = true;
+            this.closeEditModal();
+            this.fetchProducts();
+          })
+          .catch(error => {
+            if (error.response && error.response.data === "Proizvod je prodat.") {
+              this.successMessage = "Prodat proizvod ne može da se menja.";
+              this.showSuccessModal = true;
+              console.log(error);
+            } else if (error.response && error.response.data === "Proizvod se ne može izmeniti jer postoje aktivne ponude u aukciji.") {
+              this.successMessage = "Proizvod se ne može izmeniti jer postoje aktivne ponude u aukciji.";
+              this.showSuccessModal = true;
+              console.log(error);
+            } else {
+              console.log(error);
+              this.successMessage = "Došlo je do greške.";
+              this.showSuccessModal = true;
+            }
+          });
+    },
+    endAuction(id) {
+      axios.put(`http://localhost:8080/api/product/endAuction/${id}`, {}, { withCredentials: true })
+          .then(response => {
+            console.log('Aukcija je uspešno završena:', response.data);
+            this.successMessage = "Aukcija je uspešno završena.";
+            this.showSuccessModal = true;
+          })
+          .catch(error => {
+            if (error.response && error.response.data === "Prodavac nema traženi proizvod na prodaju.") {
+              this.successMessage = "Prodavac nema traženi proizvod na prodaju.";
+              this.showSuccessModal = true;
+            }else if(error.response && error.response.data === "Ne postoje ponude."){
+              this.successMessage = "Ne postoje ponude.";
+              this.showSuccessModal = true;
+            }else if(error.response && error.response.data === "Aukcija nije aktivna ili nema ponuda."){
+              this.successMessage = "Aukcija nije aktivna ili nema ponuda.";
+              this.showSuccessModal = true;
+            }
+            else {
+              console.error('Greška pri završavanju aukcije:', error);
+              this.successMessage = "Greška pri završavanju aukcije:";
+              this.showSuccessModal = true;
+            }
+          });
+    },
+    goToSellerProfile(prodavacId) {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user) {
+        this.$router.push(`/sellerProfile/${prodavacId}`);
+      } else {
+        this.successMessage="Morate biti prijavljeni da bi ste mogli da vidite profil prodavca."
+        this.showLoginModal = true;
+      }
+    },
+    goToCustomerProfile(kupacId) {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user) {
+        this.$router.push(`/customerProfile/${kupacId}`);
+      } else {
+        this.successMessage="Morate biti prijavljeni da bi ste mogli da vidite profil kupca."
+        this.showLoginModal = true;
+      }
+    },
+  }
+};
 </script>
 
 <style scoped>
+.user-profile {
+  max-width: 1200px;
+  margin: 50px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f0f0f0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
 
+.user-profile h2 {
+  text-align: center;
+}
+
+.slika {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 150px;
+  height: auto;
+  border-radius: 50%;
+}
+
+.novaLozinka {
+  margin-top: -18px;
+}
+
+.form-container {
+  display: flex;
+  justify-content: space-between;
+  margin-left: 200px;
+}
+
+.column {
+  flex: 1;
+  margin: 0 10px;
+}
+
+.password-role-container {
+  margin-top: 0px;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-profile label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.user-profile input[type="text"],
+.user-profile input[type="password"],
+.user-profile input[type="date"],
+.user-profile select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  box-sizing: border-box;
+}
+
+.user-profile button {
+  width: calc(100% - 20px);
+  padding: 12px 20px;
+  margin-top: 20px;
+  background-color: rgba(47, 128, 102, 0.76);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.user-profile button:hover {
+  background-color: rgb(72, 136, 113);
+}
+
+/* Dodati stilovi za sekciju recenzija */
+.review {
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.review h3 {
+  margin-top: 0;
+}
+
+.review p {
+  margin: 5px 0;
+}
+
+.updateDugme {
+  margin-left: 20px;
+}
+.product-section {
+  margin-top: 20px;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  box-shadow: 0 2px 5px rgba(47, 128, 102, 0.76);
+  color: rgba(47, 128, 102, 0.76);
+}
+
+.product-section h2 {
+  text-align: center;
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.product-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.product-list li {
+
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.product-list li:last-child {
+  border-bottom: none;
+
+
+}
+
+.product-list li:hover {
+  background-color: #f0f0f0;
+  cursor: pointer;
+}
+.modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(255, 255, 255, 0.26);
+  color: rgb(119, 53, 119);
+
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  width: 50%;
+  max-width: 600px;
+  box-shadow: 0 5px 15px rgba(47, 128, 102, 0.76);
+  text-align: center;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+.product-image {
+  max-width: 50%;
+  height: auto;
+  margin-bottom: 20px;
+}
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.modal-content h3 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content label {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.modal-content input[type="text"],
+.modal-content input[type="number"],
+.modal-content textarea,
+.modal-content select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 50px;
+  box-sizing: border-box;
+}
+
+.modal-content button[type="submit"] {
+  width: 100%;
+  padding: 12px 20px;
+  margin-top: 20px;
+  background-color: rgba(47, 128, 102, 0.76);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.modal-content button[type="submit"]:hover {
+  background-color: rgba(47, 128, 102, 0.76);
+}
+
+.modal-backdrop {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  z-index: 900; /* Lower than modal content, but higher than page content */
+}
+
+.button-accept {
+  background-color: rgba(47, 128, 102, 0.76); /* Zelena boja */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 50px; /* Radijus 50% širine dugmeta */
+  cursor: pointer;
+  font-size: 16px;
+  margin-right: 10px; /* Dodaj marginu sa desne strane */
+}
+
+.button-accept:hover {
+  background-color: #488871; /* Tamnija nijansa zelene boje pri hoveru */
+}
+
+.button-accept:focus {
+  outline: none; /* Uklanja outline prilikom fokusa */
+}
+.product-name-user-name:hover {
+  cursor: pointer;
+}
+
+.ime-proizvoda {
+  cursor: pointer;
+}
 </style>

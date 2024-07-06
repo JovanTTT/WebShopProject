@@ -382,5 +382,6 @@ public class KorisnikController {
 
         return new ResponseEntity<>(ponudaDTO, HttpStatus.OK);
     }
+
 }
 

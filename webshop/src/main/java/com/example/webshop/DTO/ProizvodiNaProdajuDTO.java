@@ -11,6 +11,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ProizvodiNaProdajuDTO {
 
+    private Long id;
+
     private String naziv;
 
     private String opis;
