@@ -33,7 +33,34 @@
       <button @click="nextPage" :disabled="currentPage * itemsPerPage >= reviews.length">Sledeća</button>
     </div>
 
+    <div class="naslov2">
+      <h1>Pregled svih prijava</h1>
+    </div>
 
+    <div class="review-container">
+      <div v-for="report in paginatedReports()" :key="report.id" class="review-card">
+        <p>Prijavu podneo: {{report.podnosiocPrijave.ime}} {{report.podnosiocPrijave.prezime}} "{{report.podnosiocPrijave.korisnickoIme}}"</p>
+        <p>Prijavu primio: {{report.prijavljeniKorisnik.ime}} {{report.prijavljeniKorisnik.prezime}} "{{report.prijavljeniKorisnik.korisnickoIme}}"</p>
+        <p>Razlog prijave: {{ report.razlogPrijave }}</p>
+        <p>Status: {{ report.statusPrijave }}</p>
+        <p>Datum podnošenja prijave: {{ formatDate(report.datumPodnosenjaPrijave) }}</p>
+        <div class="button-container">
+          <button class="review-button update" @click="accept(report.id)">Prihvati</button>
+          <button class="review-button delete" @click="toggleRejectionForm(report.id)">Odbij</button>
+        </div>
+        <div v-if="report.showRejectionForm" class="rejection-form">
+          <label for="rejectionReason">Razlog odbijanja:</label><br>
+          <textarea v-model="report.razlogOdbijanja"></textarea>
+          <button class="review-button save" @click="reject(report.id)">Potvrdi</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="pagination">
+      <button @click="prevPageReport" :disabled="currentPageReport === 1">Prethodna</button>
+      <span>Stranica {{ currentPageReport }}</span>
+      <button @click="nextPageReport" :disabled="currentPageReport * itemsPerPageReport >= reports.length">Sledeća</button>
+    </div>
   </div>
 </template>
 
