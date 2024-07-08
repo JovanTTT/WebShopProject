@@ -1,5 +1,8 @@
 package com.example.webshop.DTO;
 
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +15,9 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RecenzijaPrikaz3DTO {
+
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private KupacPrikazRecenzijeDTO recenzijuPodneo;
 

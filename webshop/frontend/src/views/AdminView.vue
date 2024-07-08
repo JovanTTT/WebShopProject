@@ -1,4 +1,5 @@
 <template>
+
   <div>
     <div class="naslov"><h1>Pregled svih recenzija</h1></div>
 
@@ -62,9 +63,11 @@
       <button @click="nextPageReport" :disabled="currentPageReport * itemsPerPageReport >= reports.length">Sledeća</button>
     </div>
   </div>
+
 </template>
 
 <script>
+
 import axios from "axios";
 
 export default {
@@ -95,7 +98,7 @@ export default {
             console.error('Greška pri dobavljanju podataka o recenzijama:', error);
           });
     },
-    fetchReports() {
+    fetchReports(){
 
       axios
           .get('http://localhost:8080/api/report/allReports', {withCredentials: true})
@@ -108,14 +111,14 @@ export default {
     },
     formatDate(dateString) {
 
-      const options = {year: 'numeric', month: 'long', day: 'numeric'};
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
 
       return new Date(dateString).toLocaleDateString(undefined, options);
     },
     deleteReview(reviewId) {
 
       axios
-          .delete(`http://localhost:8080/api/user/deleteReview/${reviewId}`, {withCredentials: true})
+          .delete(`http://localhost:8080/api/user/deleteReview/${reviewId}`, { withCredentials: true })
           .then(response => {
             console.log('Recenzija obrisana:', response);
             this.reviews = this.reviews.filter(review => review.id !== reviewId);
@@ -276,9 +279,11 @@ export default {
     },
   }
 }
+
 </script>
 
 <style>
+
 .naslov {
   display: flex;
   justify-content: center;
@@ -325,4 +330,56 @@ export default {
   border-radius: 4px;
   cursor: pointer;
 }
+
+.review-button.update {
+  background-color: #44449d; /* Zelena boja za Ažuriraj */
+  color: white; /* Bela boja teksta */
+}
+
+.review-button.delete {
+  background-color: #c963c9; /* Crvena boja za Obriši */
+  color: white; /* Bela boja teksta */
+}
+
+.review-button.save {
+  background-color: #ffb4f4;
+  color: white;
+  margin-top: 0;
+  margin-left: 50px;
+  margin-bottom: 10px;
+}
+
+.update-form {
+  margin-top: 40px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  margin-top: 20px;
+  margin-right: 50px;
+  margin-bottom: 30px;
+}
+
+.pagination button {
+  padding: 10px 20px;
+  margin: 0 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #488871;
+}
+
+.pagination span {
+  font-size: 18px;
+}
+
+.logout-dugme {
+  background-color: #488871;
+  margin-left: 50px;
+  margin-top: -60px;
+}
+
+
 </style>

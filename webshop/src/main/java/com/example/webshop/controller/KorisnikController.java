@@ -306,8 +306,11 @@ public class KorisnikController {
     }
 
     @PutMapping("/updateReview/{reviewId}")
-    public ResponseEntity<Recenzija> updateReviewComment (@PathVariable Long reviewId, RecenzijaPrikaz3DTO recenzija, HttpSession session) throws
-            ResourceNotFoundException, UserNotFoundException, NoSellerException {
+    public ResponseEntity<Recenzija> updateReviewComment(
+            @PathVariable Long reviewId,
+            @RequestBody RecenzijaPrikaz3DTO recenzija,
+            HttpSession session) throws ResourceNotFoundException, UserNotFoundException, NoSellerException {
+
         Korisnik korisnik = (Korisnik) session.getAttribute("korisnik");
         if (korisnik == null) {
             throw new UserNotFoundException("Samo ulogovani korisnici mogu da menjaju podatke.");

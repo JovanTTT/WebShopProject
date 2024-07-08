@@ -497,6 +497,7 @@ public class KorisnikService {
         for(Recenzija recenzija : sveRecenzije) {
             RecenzijaPrikaz3DTO dto = new RecenzijaPrikaz3DTO();
 
+            dto.setId(recenzija.getId());
             dto.setOcena(recenzija.getOcena());
             dto.setKomentar(recenzija.getKomentar());
             dto.setDatumPodnosenjaRecenzije(recenzija.getDatumRecenzije());
