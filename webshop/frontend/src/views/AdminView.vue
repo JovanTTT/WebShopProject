@@ -64,8 +64,161 @@
   </div>
 </template>
 
-<script setup>
+<script>
+import axios from "axios";
 
+export default {
+  data() {
+    return {
+      reviews: [],
+      currentPage: 1, // Trenutna stranica
+      itemsPerPage: 4, // Broj kartica po stranici
+      reports: [],
+      currentPageReport: 1, // Trenutna stranica
+      itemsPerPageReport: 4, // Broj kartica po stranici
+    };
+  },
+  mounted() {
+
+    this.fetchReviews();
+    this.fetchReports();
+  },
+  methods: {
+    fetchReviews() {
+
+      axios
+          .get('http://localhost:8080/api/user/reviews/admin', {withCredentials: true})
+          .then(response => {
+            this.reviews = response.data;
+          })
+          .catch(error => {
+            console.error('Greška pri dobavljanju podataka o recenzijama:', error);
+          });
+    },
+    fetchReports() {
+
+      axios
+          .get('http://localhost:8080/api/report/allReports', {withCredentials: true})
+          .then(response => {
+            this.reports = response.data;
+          })
+          .catch(error => {
+            console.error('Greška pri dobavljanju podataka o prijavama:', error);
+          });
+    },
+    formatDate(dateString) {
+
+      const options = {year: 'numeric', month: 'long', day: 'numeric'};
+
+      return new Date(dateString).toLocaleDateString(undefined, options);
+    },
+    deleteReview(reviewId) {
+
+      axios
+          .delete(`http://localhost:8080/api/user/deleteReview/${reviewId}`, {withCredentials: true})
+          .then(response => {
+            console.log('Recenzija obrisana:', response);
+            this.reviews = this.reviews.filter(review => review.id !== reviewId);
+          })
+          .catch(error => {
+            console.error('Greška pri brisanju recenzije:', error.response.data);
+            alert('Greška pri brisanju recenzije: ' + error.response.data.message);
+          });
+    },
+    paginatedReviews() {
+
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+
+      return this.reviews.slice(start, end);
+    },
+    paginatedReports() {
+
+      const start = (this.currentPageReport - 1) * this.itemsPerPageReport;
+      const end = start + this.itemsPerPageReport;
+
+      return this.reports.slice(start, end);
+    },
+    nextPage() {
+
+      if (this.currentPage * this.itemsPerPage < this.reviews.length) {
+        this.currentPage++;
+      }
+    },
+    nextPageReport() {
+
+      if (this.currentPageReport * this.itemsPerPageReport < this.reports.length) {
+        this.currentPageReport++;
+      }
+    },
+    prevPage() {
+
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
+    },
+    prevPageReport() {
+
+      if (this.currentPageReport > 1) {
+        this.currentPageReport--;
+      }
+    },
+    toggleUpdateForm(reviewId) {
+
+      this.reviews = this.reviews.map(review => {
+        if (review.id === reviewId) {
+          review.showUpdateForm = !review.showUpdateForm;
+          if (review.showUpdateForm) {
+            review.newRating = review.ocena;
+            review.newComment = review.komentar;
+          }
+        }
+        return review;
+      });
+    },
+
+    saveReview(reviewId) {
+
+      const reviewToUpdate = this.reviews.find(review => review.id === reviewId);
+
+      const updateData = {
+        id: reviewId,
+        ocena: reviewToUpdate.newRating,
+        komentar: reviewToUpdate.newComment
+      };
+
+      axios
+          .put(`http://localhost:8080/api/user/updateReview/${reviewId}`, updateData, {
+            withCredentials: true,
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          })
+          .then(response => {
+            // Osvježite listu recenzija sa ažuriranim podacima
+            this.reviews = this.reviews.map(review =>
+                review.id === reviewId ? {
+                  ...review,
+                  ocena: reviewToUpdate.newRating,
+                  komentar: reviewToUpdate.newComment,
+                  showUpdateForm: false
+                } : review
+            );
+            console.log('Recenzija ažurirana:', response.data);
+          })
+          .catch(error => {
+            console.error('Greška pri ažuriranju recenzije:', error);
+            alert('Greška pri ažuriranju recenzije: ' + error.response.data.message);
+          });
+
+      console.log('ID recenzije za čuvanje:', reviewId);
+    },
+    logout() {
+      localStorage.removeItem('user');
+      this.$router.push("/");
+    },
+  }
+}
 </script>
 
 <style scoped>
