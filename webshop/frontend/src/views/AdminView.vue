@@ -176,7 +176,64 @@ export default {
         return review;
       });
     },
+    toggleRejectionForm(reportId) {
 
+      this.reports = this.reports.map(report => {
+        if (report.id === reportId) {
+          report.showRejectionForm = !report.showRejectionForm;
+          if (report.showRejectionForm) {
+            report.rejectionReason = '';
+          }
+        }
+        return report;
+      });
+    },
+    accept(reportId) {
+
+      axios.post(`http://localhost:8080/api/report/adminAcceptReport/${reportId}`, {}, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+          .then(response => {
+            console.log('Prijava prihvaćena:', response.data);
+            // Ažurirajte status prijave na lokalnoj listi
+            this.reports = this.reports.map(report =>
+                report.id === reportId ? {...report, statusPrijave: 'PRIHVACENA'} : report
+            );
+          })
+          .catch(error => {
+            console.error('Greška pri prihvatanju prijave:', error);
+            alert('Prijava je vec obradjena!');
+          });
+    },
+    reject(reportId) {
+
+      const reportToReject = this.reports.find(report => report.id === reportId);
+      const rejectionData = {
+        razlogOdbijanja: reportToReject.rejectionReason
+      };
+
+      axios
+          .post(`http://localhost:8080/api/report/adminRejectionReport/${reportId}`, rejectionData, {
+            withCredentials: true,
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          })
+          .then(response => {
+            console.log('Prijava odbijena:', response);
+            // Ažurirajte status prijave u lokalnoj listi
+            this.reports = this.reports.map(report =>
+                report.id === reportId ? {...report, statusPrijave: 'ODBIJENA', showRejectionForm: false} : report
+            );
+          })
+          .catch(error => {
+            console.error('Greška pri odbijanju prijave:', error);
+            alert('Prijava je vec obradjena!');
+          });
+    },
     saveReview(reviewId) {
 
       const reviewToUpdate = this.reviews.find(review => review.id === reviewId);
