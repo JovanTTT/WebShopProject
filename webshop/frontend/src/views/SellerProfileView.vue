@@ -43,7 +43,41 @@
     <!-- Dugme za ostavljanje ocene -->
     <button v-if="checkUserType" @click="showRateSellerModal = true" class="rate-button">Ostavi ocenu</button>
 
-
+    <!-- Modalni dijalog za ocenjivanje prodavca -->
+    <div v-if="showRateSellerModal" class="modal">
+      <div class="modal-content">
+        <span class="close" @click="closeRateSellerModal">&times;</span>
+        <h2>Oceni prodavca</h2>
+        <form @submit.prevent="submitRating">
+          <label for="ocena">Ocena:</label>
+          <input type="number" id="ocena" v-model="ocenaKupca" min="1" max="5" required>
+          <label for="komentar">Komentar:</label>
+          <textarea id="komentar" v-model="komentarKupca"></textarea>
+          <button type="submit">Pošalji ocenu</button>
+        </form>
+      </div>
+    </div>
+    <button v-if="checkUserType" @click="showComplaintModal = true" class="submit-button">Prijavi prodavca</button>
+    <!-- Modalni dijalog za prijavu prodavca -->
+    <div v-if="showComplaintModal" class="modal">
+      <div class="modal-content">
+        <span class="close" @click="closeComplaintModal">&times;</span>
+        <h2>Prijavi prodavca</h2>
+        <form @submit.prevent="submitComplaint">
+          <label for="prijava">Prijava:</label>
+          <textarea id="prijava" v-model="prijavaText" required></textarea>
+          <button type="submit">Pošalji prijavu</button>
+        </form>
+      </div>
+    </div>
+    <!-- Modalni prozor za grešku -->
+    <div v-if="showErrorModal" class="modal">
+      <div class="modal-content">
+        <span class="close" @click="closeErrorModal">&times;</span>
+        <h2>Greška</h2>
+        <p>{{successMessage }}</p>
+      </div>
+    </div>
   </div>
 </template>
 
