@@ -189,7 +189,6 @@ public class KorisnikService {
 
                 for(Proizvod p: prodavac.getProizvodiNaProdaju()){
                     ProizvodiNaProdajuDTO proizvodNaProdajuDTO=new ProizvodiNaProdajuDTO();
-                    proizvodNaProdajuDTO.setId(p.getId());
                     proizvodNaProdajuDTO.setCena(p.getCena());
                     proizvodNaProdajuDTO.setNaziv(p.getNaziv());
                     proizvodNaProdajuDTO.setSlikaProizvoda(p.getSlikaProizvoda());
@@ -197,7 +196,6 @@ public class KorisnikService {
                     proizvodiNaProdajuDTO.add(proizvodNaProdajuDTO);
                 }
                 ProdavacProfilDTO prodavacProfilDTO = new ProdavacProfilDTO();
-                prodavacProfilDTO.setId(korisnik.getId());
                 prodavacProfilDTO.setIme(korisnik.getIme());
                 prodavacProfilDTO.setPrezime(korisnik.getPrezime());
                 prodavacProfilDTO.setKorisnickoIme(korisnik.getKorisnickoIme());

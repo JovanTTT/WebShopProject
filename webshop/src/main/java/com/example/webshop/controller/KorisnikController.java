@@ -29,7 +29,7 @@ public class KorisnikController {
     @Autowired
     private ProizvodService proizvodService;
 
-      @PostMapping(value = "/registration", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/registration", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Korisnik> registracijaKorisnika(@Valid @RequestBody RegistracijaKorisnikaDTO korisnik) throws UserAlreadyExistsException, EmailAlreadyExistsException, PasswordMismatchException {//valid proverava da li su ispunjeni zahtevi unutar registracija korstnika dTO
 
         Korisnik registrovaniKorisnik = korisnikService.registracijaKorisnika(korisnik);
@@ -87,10 +87,6 @@ public class KorisnikController {
             throw new NoSellerException("Ne možete menjati podatke drugima.");
         }
 
-        if(existingUser.get().getUloga() != Uloga.KUPAC){
-            throw new NoSellerException("Samo kupac može da menja podatke.");
-        }
-
         korisnikService.updateSeller(existingUser.get(), updatedSeller);
         return ResponseEntity.ok().build();
 
@@ -100,9 +96,9 @@ public class KorisnikController {
     public ResponseEntity<?> getUser(@PathVariable(name = "id") Long id, HttpSession session) throws UserNotFoundException {
         Korisnik korisnik = (Korisnik) session.getAttribute("korisnik");
 
-        if(korisnik == null){
-            throw new UserNotFoundException("Niste prijavljeni.");
-        }
+//        if(korisnik == null){
+//            throw new UserNotFoundException("Niste prijavljeni.");
+//        }
 
         Optional<Korisnik> korisnikOptional = korisnikService.findById(id);
         if (korisnikOptional.isEmpty()) {
@@ -146,10 +142,6 @@ public class KorisnikController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        if(existingUser.get().getUloga() != Uloga.PRODAVAC){
-            throw new NoCustomerException("Samo PRODAVAC moze da menja podatke.");
-        }
-
         korisnikService.updateCustomer(existingUser.get(), updatedCustomer);
         return ResponseEntity.ok().build();
 
@@ -160,9 +152,9 @@ public class KorisnikController {
 
         Korisnik korisnik = (Korisnik) session.getAttribute("korisnik");
 
-        if (korisnik == null) {
-            throw new UserNotFoundException("Samo ulogovani korisnici mogu da ocenjuju druge korisnike.");
-        }
+//        if (korisnik == null) {
+//            throw new UserNotFoundException("Samo ulogovani korisnici mogu da ocenjuju druge korisnike.");
+//        }
 
         if (!korisnikService.jeKupacKupioOdProdavca(korisnik.getId(), prodavacId)) {
             throw new UserNotFoundException("Kupac može da oceni prodavca samo ako je kupio proizvod od tog prodavca.");
@@ -176,9 +168,9 @@ public class KorisnikController {
     public double prosecnaOcena (@PathVariable Long prodavacId, HttpSession session) throws UserNotFoundException, NoSellerException {
         Korisnik korisnik = (Korisnik) session.getAttribute("korisnik");
 
-        if (korisnik == null) {
-            throw new UserNotFoundException("Samo ulogovanik korisnici mogu da vide prosecne ocene drugih prodavaca!");
-        }
+//        if (korisnik == null) {
+//            throw new UserNotFoundException("Samo ulogovanik korisnici mogu da vide prosecne ocene drugih prodavaca!");
+//        }
 
         Optional<Korisnik> prodavac = korisnikService.findById(prodavacId);
         if(prodavac.get().getUloga() != Uloga.PRODAVAC){
@@ -358,6 +350,8 @@ public class KorisnikController {
         }
         ProizvodiNaProdajuDTO kupljeniProizvodFiksna = proizvodService.kupiProizvodFiksnaCena(proizvod.get(), korisnik);
         return kupljeniProizvodFiksna;
+
+
     }
 
     @PostMapping("/shopNowAuction")

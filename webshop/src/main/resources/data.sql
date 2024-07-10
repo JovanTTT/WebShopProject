@@ -38,13 +38,13 @@ VALUES ('prodao mi je pokvaren proizvod', NULL,NULL,'2023-11-13 20:56:41', 'PODN
 INSERT INTO prijava_profila(razlog_prijave,razlog_odbijanja, razlog_prihvatanja, datum_podnosenja_prijave, status_prijave, podnosioc_prijave_id, prijavljeni_korisnik_id)
 VALUES ('prevarant',NULL,'Vise ljudi je izjavilo ovaj komentar', '2023-08-14 10:56:31', 'PODNETA', 1000, 2000);
 
-INSERT INTO Kupac(id, prosecna_ocena) VALUES (1000, 0);
-INSERT INTO Kupac(id, prosecna_ocena) VALUES (5000, 0);
-INSERT INTO Kupac(id, prosecna_ocena) VALUES (7000, 0);
+INSERT INTO Kupac(id, prosecna_ocena) VALUES (1000, 1.1);
+INSERT INTO Kupac(id, prosecna_ocena) VALUES (5000, 3.8);
+INSERT INTO Kupac(id, prosecna_ocena) VALUES (7000, 4);
 
-INSERT INTO Prodavac(id, prosecna_ocena) VALUES(2000, 0);
-INSERT INTO Prodavac(id, prosecna_ocena) VALUES(3000, 0);
-INSERT INTO Prodavac(id, prosecna_ocena) VALUES(6000, 0);
+INSERT INTO Prodavac(id, prosecna_ocena) VALUES(2000, 2.2);
+INSERT INTO Prodavac(id, prosecna_ocena) VALUES(3000, 3.3);
+INSERT INTO Prodavac(id, prosecna_ocena) VALUES(6000, 4.4);
 
 
 INSERT INTO Proizvod (cena, prodat, recenzija_kupac, recenzija_prodavac, datum_objavljivanja, id, kupac_id, prodavac_id, naziv,
