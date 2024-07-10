@@ -17,6 +17,8 @@ import java.util.Set;
 @AllArgsConstructor
 public class KupacProfilDTO {
 
+    private Long id;
+
     private String ime;
 
     private String prezime;

@@ -218,7 +218,7 @@ public class KorisnikController {
             throw  new NoSellerException("Korisnik sa zeljenim ID-jem nije kupac!");
         }
 
-        return korisnikService.izracunajProsecnuOcenuKupca(kupacId);
+        return korisnikService.izracunajProsecnuOcenu(kupacId);
     }
 
     @GetMapping("/reviewsBuyer/sent")

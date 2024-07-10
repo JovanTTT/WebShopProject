@@ -189,6 +189,7 @@ public class KorisnikService {
 
                 for(Proizvod p: prodavac.getProizvodiNaProdaju()){
                     ProizvodiNaProdajuDTO proizvodNaProdajuDTO=new ProizvodiNaProdajuDTO();
+                    proizvodNaProdajuDTO.setId(p.getId());
                     proizvodNaProdajuDTO.setCena(p.getCena());
                     proizvodNaProdajuDTO.setNaziv(p.getNaziv());
                     proizvodNaProdajuDTO.setSlikaProizvoda(p.getSlikaProizvoda());
@@ -196,6 +197,7 @@ public class KorisnikService {
                     proizvodiNaProdajuDTO.add(proizvodNaProdajuDTO);
                 }
                 ProdavacProfilDTO prodavacProfilDTO = new ProdavacProfilDTO();
+                prodavacProfilDTO.setId(korisnik.getId());
                 prodavacProfilDTO.setIme(korisnik.getIme());
                 prodavacProfilDTO.setPrezime(korisnik.getPrezime());
                 prodavacProfilDTO.setKorisnickoIme(korisnik.getKorisnickoIme());
@@ -310,10 +312,18 @@ public class KorisnikService {
         return prodavacDTO;
     }
 
-    public double izracunajProsecnuOcenu(Long prodavacId) {
+    public Double izracunajProsecnuOcenu(Long prodavacId) {
 
-        Prodavac prodavac = prodavacRepository.findById(prodavacId).get();
-        return prodavac.getOcene().values().stream().mapToInt(Integer::intValue).average().orElse(prodavac.getProsecnaOcena());
+//        Prodavac prodavac = prodavacRepository.findById(prodavacId).get();
+//        return prodavac.getOcene().values().stream().mapToInt(Integer::intValue).average().orElse(prodavac.getProsecnaOcena());
+        // return recenzijaRepository.findAverageRatingByKorisnikId(prodavacId);
+        Double prosecnaOcena = recenzijaRepository.findAverageRatingByKorisnikId(prodavacId);
+        if (prosecnaOcena == null) {
+            // Opciono: možete postaviti neku podrazumevanu vrednost ili vratiti null
+            return null;
+        } else {
+            return prosecnaOcena.doubleValue();
+        }
     }
 
     public boolean jeProdavacProdaoKupcu(Long prodavacId, Long kupacId) {
