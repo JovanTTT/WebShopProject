@@ -65,7 +65,140 @@
 </template>
 
 <script setup>
+import axios from 'axios';
 
+
+export default {
+  name: 'ProductDetails',
+  data() {
+    return {
+      product: {
+        prodavac: {}
+      },
+      showLoginModal: false,
+      showSuccessModal: false,
+      showAlreadyPurchasedModal: false,
+      showLowBidModal: false,
+      novaPonuda: 1,
+      successMessage: ''
+    };
+  },
+  mounted:function() {
+
+    const productId = this.$route.params.id;
+
+    axios.get("http://localhost:8080/api/product/" + productId)
+        .then(response => {
+          this.product = response.data;
+        })
+        .catch(error => {
+          console.error('Greška pri dobijanju detalja proizvoda:', error);
+        });
+  },
+  methods: {
+    closeProductDetails() {
+
+      this.$router.push('/');
+    },
+    buyProduct() {
+
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user) {
+        this.successMessage="Morate biti prijavljeni da bi ste kupili proizvod.";
+        this.showLoginModal = true;
+      } else {
+        console.log("Korisnik je ulogovan. Nastavlja se sa kupovinom...");
+
+        if (this.product.tipProdaje === 'FIKSNA') {
+
+          axios.post(`http://localhost:8080/api/user/shopNowFixedPrice/${this.product.id}`, {}, {
+            withCredentials: true
+          })
+              .then(response => {
+                console.log(this.product.id);
+                console.log("Proizvod uspešno kupljen:", response.data);
+                this.successMessage = "Uspešno ste kupili proizvod!";
+                this.showSuccessModal = true;
+              })
+              .catch(error => {
+                if(error.response.data ==="Samo kupac može da kupuje."){
+                  this.successMessage = "Samo kupac može da kupuje.";
+                  this.showSuccessModal = true;
+                }else {
+
+                  console.error('Greška pri kupovini proizvoda:', error);
+                  this.successMessage = "Greška pri kupovini proizvoda.";
+                  this.showSuccessModal = true;
+                }
+              });
+        }else if (this.product.tipProdaje === 'AUKCIJA') {
+
+          axios.post(`http://localhost:8080/api/user/shopNowAuction`, {}, {
+            params: {
+              id: this.product.id,
+              novaPonuda: this.novaPonuda
+            },
+            withCredentials: true
+          })
+              .then(response => {
+                console.log(this.product.id);
+                console.log("Ponuda uspešno prihvaćena:", response.data);
+                this.successMessage = "Vaša ponuda je prihvaćena!";
+                this.showSuccessModal = true;
+              })
+              .catch(error => {
+                console.error('Greška pri postavljanju ponude:', error);
+                console.log('Error response:', error.response);
+                if (error.response && typeof error.response.data === 'string') {
+                  if (error.response.data === 'Proizvod je već prodat.') {
+                    this.showAlreadyPurchasedModal = true;
+                  } else if (error.response.data.startsWith('Ponuda koju ste poslali se nije uvažila jer je drugi korisnik poslao veću: ')) {
+                    this.successMessage =error.response.data;
+                    this.showSuccessModal = true;
+                  } else if(error.response.data ==="Samo kupci mogu da daju ponude."){
+                    this.successMessage = "Samo kupci mogu da daju ponude.";
+                    this.showSuccessModal = true;
+                  }
+                } else {
+                  this.successMessage = "Došlo je do greške pri postavljanju ponude.";
+                  this.showSuccessModal = true;
+                }
+              });
+        }
+      }
+    },
+    closeLoginModal() {
+
+      this.showLoginModal = false;
+    },
+    redirectToLogin() {
+
+      this.$router.push('/login');
+    },
+    closeSuccessModal() {
+
+      this.showSuccessModal = false;
+    },
+    closeAlreadyPurchasedModal() {
+
+      this.showAlreadyPurchasedModal = false;
+    },
+    closeLowBidModal() {
+
+      this.showLowBidModal = false;
+    },
+    goToSellerProfile(prodavacId) {
+
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user) {
+        this.$router.push(`/sellerProfile/${prodavacId}`);
+      } else {
+        this.successMessage="Morate biti prijavljeni da bi ste mogli da vidite profil prodavca."
+        this.showLoginModal = true;
+      }
+    },
+  }
+};
 </script>
 
 <style scoped>
