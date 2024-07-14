@@ -63,8 +63,7 @@
     </div>
   </div>
 </template>
-
-<script setup>
+<script>
 import axios from 'axios';
 
 
@@ -200,7 +199,6 @@ export default {
   }
 };
 </script>
-
 <style scoped>
 .btn-close {
   position: absolute;
@@ -325,4 +323,5 @@ export default {
   text-decoration: none;
   cursor: pointer;
 }
+
 </style>

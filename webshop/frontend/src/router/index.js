@@ -4,11 +4,9 @@ import HomeView from '../views/HomeView.vue'
 import LoginView from "@/views/LoginView.vue";
 import RegistrationView from "@/views/RegistrationView.vue";
 import ProductView from "@/views/ProductView.vue";
-// import HomePageView from "@/views/HomePageView.vue";
 import ProfileView from "@/views/ProfileView.vue";
 import SellerProfileView from "@/views/SellerProfileView.vue";
-// import RecenzijeView from "@/views/RecenzijeView.vue";
-// import CustomerProfileView from "@/views/CustomerProfileView.vue";
+import CustomerProfileView from "@/views/CustomerProfileView.vue";
 import AdminView from "@/views/AdminView.vue";
 
 
@@ -65,12 +63,12 @@ const routes = [
     component: SellerProfileView,
     props: true
   },
-  // {
-  //   path: '/customerProfile/:id',
-  //   name: 'customerProfile',
-  //   component: CustomerProfileView,
-  //   props: true
-  // }
+  {
+    path: '/customerProfile/:id',
+    name: 'customerProfile',
+    component: CustomerProfileView,
+    props: true
+  }
 
 ]
 
