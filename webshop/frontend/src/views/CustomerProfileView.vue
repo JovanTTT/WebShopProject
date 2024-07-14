@@ -78,7 +78,126 @@
 </template>
 
 <script setup>
+import axios from "axios";
 
+export default {
+  name: 'SellerProfileView',
+
+  data() {
+    return {
+      kupac: {
+        ime: '',
+        prezime: '',
+        korisnickoIme: '',
+        telefon: '',
+        opisKorisnika: '',
+        slika: '', // Dodato polje za sliku
+        kupljeniProizvodi: [],
+        dobijeneRecenzije: [],
+        prosecnaOcena: 0
+      },
+      user: null,
+      isSeller: false,
+      canRateCustomer: false,
+      showRateCustomerModal: false,
+      ocenaKupca: 1,
+      komentarKupca: '',
+      showErrorModal: false,
+      showComplaintModal: false,
+      prijavaText: '',
+      successMessage: ''
+    };
+  },
+  mounted() {
+
+    const kupacId = this.$route.params.id;
+
+    axios.get(`http://localhost:8080/api/user/profileView/${kupacId}`, { withCredentials: true })
+        .then(response => {
+          this.kupac = response.data;
+        })
+        .catch(error => {
+          console.error('Greška pri dobijanju profila prodavca:', error);
+        });
+    this.fetchAverageRating(kupacId);
+
+  },
+  methods: {
+
+    checkUserType() {
+
+      this.user = JSON.parse(localStorage.getItem('user'));
+
+      if (this.user && this.user.uloga === 'PRODAVAC') {
+        this.isSeller = true;
+      }
+    },
+    closeRateCustomerModal() {
+
+      this.showRateCustomerModal = false;
+      this.ocenaProdavca = 1;
+      this.komentarProdavca = '';
+    },
+    closeErrorModal() {
+
+      this.showErrorModal = false; // Zatvaranje grešnog modalnog prozora
+    },
+    closeComplaintModal() {
+
+      this.showComplaintModal = false;
+      this.prijavaText = '';
+    },
+    fetchAverageRating(kupacId) {
+
+      axios.get(`http://localhost:8080/api/user/averageRatingBuyer/${kupacId}`, { withCredentials: true })
+          .then(response => {
+            this.kupac.prosecnaOcena = response.data.toFixed(1);
+          })
+          .catch(error => {
+            console.error('Greška pri dobijanju prosečne ocene prodavca:', error);
+          });
+    },
+    submitRating() {
+
+      const kupacId = this.$route.params.id;
+
+      axios.post('http://localhost:8080/api/user/rateBuyer/'+ kupacId + '?ocena=' + this.ocenaProdavca +'&komentar=' + this.komentarProdavca, {}, {withCredentials: true})
+          .then(response => {
+            console.log('Ocena uspešno poslata:', response.data);
+            this.closeRateCustomerModal();
+          })
+          .catch(error => {
+            if (error.response && error.response.data === 'Prodavac može da oceni kupca samo ako je prodao proizvod tom kupcu.') {
+              this.successMessage= "Prodavac može da oceni kupca samo ako je prodao proizvod tom kupcu.";
+              this.showErrorModal = true;
+            } else {
+              console.error('Nepoznata greška:', error);
+            }
+          });
+    },
+    submitComplaint() {
+
+      const kupacId = this.$route.params.id;
+      const prijavaRequestDTO = {
+        razlogPrijave: this.prijavaText
+      };
+
+      axios.post(`http://localhost:8080/api/report/sellerRequest/${kupacId}`, prijavaRequestDTO, { withCredentials: true })
+          .then(response => {
+            console.log('Prijava uspešno poslata:', response.data);
+            this.closeComplaintModal();
+          })
+          .catch(error => {
+            if (error.response && error.response.data==="Prodavac može da da recenziju onom kupcu, koji je od njega kupio proizvod.") {
+              this.successMessage= "Prodavac može da da recenziju onom kupcu, koji je od njega kupio proizvod..";
+              this.showErrorModal = true;
+            } else {
+              console.error('Nepoznata greška:', error);
+            }
+          });
+    }
+  }
+};
 </script>
 
 <style scoped>
