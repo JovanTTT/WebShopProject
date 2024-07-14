@@ -77,7 +77,7 @@
   </div>
 </template>
 
-<script setup>
+<script >
 import axios from "axios";
 
 export default {
@@ -199,7 +199,6 @@ export default {
   }
 };
 </script>
-
 <style scoped>
 .seller-profile {
   font-family: Arial, sans-serif;
@@ -349,4 +348,5 @@ button.rate-button, button.submit-button {
 button.rate-button:hover, button.submit-button:hover {
   background-color: #357a61; /* Tamnija nijansa zelene boje prilikom hovera */
 }
+
 </style>

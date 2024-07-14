@@ -113,7 +113,7 @@ export default {
   },
   mounted() {
     const prodavacId = this.$route.params.id;
-    axios.get(`http://localhost:8080/api/user/profileView/${prodavacId}`, {withCredentials: true})
+    axios.get(`http://localhost:8080/api/user/profileView/${prodavacId}`, { withCredentials: true })
         .then(response => {
           this.prodavac = response.data;
         })
@@ -145,7 +145,7 @@ export default {
     },
     fetchAverageRating(prodavacId) {
 
-      axios.get(`http://localhost:8080/api/user/averageRatingSeller/${prodavacId}`, {withCredentials: true})
+      axios.get(`http://localhost:8080/api/user/averageRatingSeller/${prodavacId}`, { withCredentials: true })
           .then(response => {
             this.prodavac.prosecnaOcena = response.data.toFixed(1);
           })
@@ -158,7 +158,7 @@ export default {
       const prodavacId = this.$route.params.id;
       console.log(prodavacId);
 
-      axios.post('http://localhost:8080/api/user/rateSeller/' + prodavacId + '?ocena=' + this.ocenaKupca + '&komentar=' + this.komentarKupca, {}, {withCredentials: true})
+      axios.post('http://localhost:8080/api/user/rateSeller/'+ prodavacId + '?ocena=' + this.ocenaKupca +'&komentar=' + this.komentarKupca, {}, {withCredentials: true})
           .then(response => {
             console.log('Ocena uspešno poslata:', response.data);
             this.closeRateSellerModal();
@@ -166,7 +166,7 @@ export default {
           .catch(error => {
             if (error.response && error.response.data === 'Kupac može da oceni prodavca samo ako je kupio proizvod od tog prodavca.') {
               // Prikaži modalski dijalog ili skočni prozor
-              this.successMessage = "Ne možete oceniti prodavca od kog niste kupili proizvod.";
+              this.successMessage= "Ne možete oceniti prodavca od kog niste kupili proizvod.";
               this.showErrorModal = true;
             } else {
               console.error('Nepoznata greška:', error);
@@ -178,20 +178,21 @@ export default {
       const prijavaRequestDTO = {
         razlogPrijave: this.prijavaText
       };
-      axios.post(`http://localhost:8080/api/report/customerRequest/${prodavacId}`, prijavaRequestDTO, {withCredentials: true})
+      axios.post(`http://localhost:8080/api/report/customerRequest/${prodavacId}`, prijavaRequestDTO, { withCredentials: true })
           .then(response => {
             console.log('Prijava uspešno poslata:', response.data);
             this.closeComplaintModal();
           })
           .catch(error => {
-            if (error.response && error.response.data === "Kupac može da prijavi onog prodavca od kog je kupio proizvod") {
+            if (error.response && error.response.data==="Kupac može da prijavi onog prodavca od kog je kupio proizvod") {
               console.error('Ne moze da prijavi jer on nije kupio proizvod od tog prodavca', error.response.data);
-              this.successMessage = "Ne možete da prijavite prodavca od kog niste kupili proizvod.";
+              this.successMessage= "Ne možete da prijavite prodavca od kog niste kupili proizvod.";
               this.showErrorModal = true;
-            } else if (error.response && error.response.data === "Korisnik koji nije kupac, ne može da prijavi prodavca.") {
-              this.successMessage = "Korisnik koji nije kupac, ne može da prijavi prodavca.";
+            }else if(error.response && error.response.data==="Korisnik koji nije kupac, ne može da prijavi prodavca."){
+              this.successMessage= "Korisnik koji nije kupac, ne može da prijavi prodavca.";
               this.showErrorModal = true;
-            } else {
+            }
+            else {
 
               console.error('Nepoznata greška:', error);
             }
@@ -334,7 +335,6 @@ form button {
   background-color: rgba(47, 128, 102, 0.76);
   border-radius: 50px;
 }
-
 button.rate-button, button.submit-button {
   display: block;
   width: 100%;

@@ -1,4 +1,5 @@
 <template>
+
   <div>
     <HelloWorld />
     <div class="registration-form">
@@ -48,6 +49,7 @@
       </div>
     </div>
   </div>
+
 </template>
 
 <script>
@@ -76,15 +78,15 @@ export default {
           })
           .catch((error) => {
             if (error.response && error.response.data === "Korisnik sa ovim email-om već postoji.") {
-              this.successMessage= "Korisnik sa ovim email-om već postoji.";
+              this.successMessage = "Korisnik sa ovim email-om već postoji.";
               this.showErrorModal = true;
-            }else if(error.response && error.response.data === "Korisnik sa ovim korisnickim imenom vec postoji."){
-              this.successMessage= "Korisnik sa ovim korisnickim imenom vec postoji.";
+            } else if (error.response && error.response.data === "Korisnik sa ovim korisnickim imenom vec postoji.") {
+              this.successMessage = "Korisnik sa ovim korisnickim imenom vec postoji.";
               this.showErrorModal = true;
-            }else if(error.response && error.response.data ===  "Lozinke se ne poklapaju."){
-              this.successMessage= "Lozinke se ne poklapaju.";
+            } else if (error.response && error.response.data === "Lozinke se ne poklapaju.") {
+              this.successMessage = "Lozinke se ne poklapaju.";
               this.showErrorModal = true;
-            }else{
+            } else {
               console.log(error);
             }
           });
@@ -98,6 +100,7 @@ export default {
 </script>
 
 <style>
+
 .registration-form {
   display: flex;
   justify-content: space-around;
@@ -157,17 +160,19 @@ export default {
 
 .registration-form button:hover {
   background-color: rgb(72, 136, 113);
-}.modal {
-   position: fixed;
-   top: 0;
-   left: 0;
-   width: 100%;
-   height: 100%;
-   background-color: rgba(0, 0, 0, 0.5);
-   display: flex;
-   align-items: center;
-   justify-content: center;
- }
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .modal-content {
   background-color: #ffffff;
@@ -177,6 +182,7 @@ export default {
   max-width: 500px;
   text-align: center;
 }
+
 .modal-content .close {
   position: absolute;
   top: 10px;
@@ -189,4 +195,5 @@ export default {
 .modal-content .close:hover {
   color: #000;
 }
+
 </style>
