@@ -201,5 +201,152 @@ export default {
 </script>
 
 <style scoped>
+.seller-profile {
+  font-family: Arial, sans-serif;
+  margin: 20px auto;
+  padding: 20px;
+  max-width: 600px;
+  border: 2px solid #488871;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
 
+.brand {
+  font-size: 2em;
+  margin-bottom: 10px;
+  text-align: center;
+  color: #488871;
+}
+
+.seller-image {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.seller-image img {
+  width: 150px;
+  height: 150px;
+  border-radius: 10px;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.basic-info {
+  margin-bottom: 20px;
+}
+
+.products {
+  margin-bottom: 20px;
+}
+
+.reviews {
+  margin-bottom: 20px;
+  background-color: #ffffff;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.reviews li {
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: rgba(187, 224, 208, 0.84);
+}
+
+.username {
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+button.rate-button, button.submit-button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  background-color: rgba(47, 128, 102, 0.76);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+button.rate-button:hover, button.submit-button:hover {
+  background-color: #357a61;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 5px;
+  width: 90%;
+  max-width: 500px;
+  text-align: center;
+}
+
+.modal-content .close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 1.5em;
+  color: #aaa;
+}
+
+.modal-content .close:hover {
+  color: #000;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+form label {
+  margin-top: 10px;
+  text-align: left;
+}
+
+form input, form textarea {
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+form button {
+  margin-top: 20px;
+  background-color: rgba(47, 128, 102, 0.76);
+  border-radius: 50px;
+}
+button.rate-button, button.submit-button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  background-color: rgba(47, 128, 102, 0.76); /* Zelena boja */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+button.rate-button:hover, button.submit-button:hover {
+  background-color: #357a61; /* Tamnija nijansa zelene boje prilikom hovera */
+}
 </style>
